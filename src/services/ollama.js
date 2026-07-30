@@ -141,6 +141,41 @@ export async function chat(model, messages) {
 }
 
 /**
+ * Sends a chat request supporting tool calls (Agentic AI)
+ * @param {string} model - The model name to use
+ * @param {Array} messages - Array of message objects {role, content}
+ * @param {Array} tools - Array of tool definitions
+ * @returns {Promise<Object>} The message object which may contain tool_calls
+ */
+export async function agentChat(model, messages, tools) {
+  try {
+    const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      mode: 'cors',
+      body: JSON.stringify({
+        model,
+        messages,
+        stream: false,
+        tools: tools
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to agentChat: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.message || { content: '' };
+  } catch (error) {
+    console.error('Error in agentChat:', error);
+    return { content: 'Agent failed to connect to Ollama.' };
+  }
+}
+
+/**
  * Generates embeddings for a given text
  * @param {string} model - The embedding model to use
  * @param {string} text - The input text

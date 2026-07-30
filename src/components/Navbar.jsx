@@ -1,7 +1,8 @@
 import React from 'react';
 import { Menu, Sun, Moon, Search } from 'lucide-react';
+import GlobalAIChat from './GlobalAIChat';
 
-export default function Navbar({ onOpenSettings, ollamaConnected, isDarkMode, toggleTheme }) {
+export default function Navbar({ selectedModel, ollamaConnected, isDarkMode, toggleTheme }) {
   return (
     <header className="w-full bg-[#070B15] border-b border-white/10 px-4 lg:px-8 py-3 flex items-center justify-between sticky top-0 z-50 transition-colors">
       {/* Left: Brand Logo & Title matching Image 1 */}
@@ -28,14 +29,17 @@ export default function Navbar({ onOpenSettings, ollamaConnected, isDarkMode, to
         </div>
 
         {/* Center Hamburger Menu icon matching Image 1 */}
-        <button className="p-2 text-slate-400 hover:text-white transition-colors ml-4 hidden md:block">
+        <button className="p-2 text-slate-400 hover:text-white transition-colors ml-4 hidden md:block lg:hidden">
           <Menu className="w-5 h-5" />
         </button>
       </div>
 
+      {/* Center: Global AI Command Bar */}
+      <GlobalAIChat selectedModel={selectedModel} ollamaConnected={ollamaConnected} />
+
       {/* Right Controls matching Image 1 */}
-      <div className="flex items-center gap-4">
-        <div className="offline-status-pill">
+      <div className="flex items-center gap-4 shrink-0">
+        <div className="offline-status-pill hidden sm:inline-flex">
           <span className={ollamaConnected ? "green-pulse-dot" : "w-2 h-2 rounded-full bg-amber-500"} />
           <span className="text-xs font-bold text-white tracking-wide">
             {ollamaConnected ? "🟢 AI Online" : "⚡ Offline Mode"}
