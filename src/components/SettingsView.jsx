@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Cpu, HardDrive, Sliders, CheckCircle, ShieldCheck, Zap, Battery, AlertTriangle } from 'lucide-react';
+import { Settings, Cpu, HardDrive, Sliders, CheckCircle, ShieldCheck, Zap, Battery, AlertTriangle, ExternalLink, Download, RefreshCw } from 'lucide-react';
 import { listModels, pullModel, checkOllamaConnection, RECOMMENDED_MODELS } from '../services/ollama';
 import { setSetting } from '../db/hooks';
 import db from '../db/database';
@@ -370,6 +370,39 @@ export default function SettingsView({ ollamaConnected, ollamaModels, selectedMo
         </div>
       </div>
 
+      {/* Application Version & Software Updates */}
+      <div className="bg-[#0E1629] border border-white/10 p-6 rounded-2xl space-y-4">
+        <h3 className="font-bold text-white font-['Outfit'] text-base border-b border-white/10 pb-3 flex items-center justify-between">
+          <span>Application Version & Updates</span>
+          <span className="text-xs font-mono font-bold bg-[#FF9F00]/10 text-[#FF9F00] px-2.5 py-1 rounded-md border border-[#FF9F00]/30">
+            v1.0.0 Stable
+          </span>
+        </h3>
+        
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h4 className="text-sm font-bold text-white flex items-center gap-2">
+              <RefreshCw className="w-4 h-4 text-emerald-400" />
+              Check for App Updates & New Releases
+            </h4>
+            <p className="text-xs text-slate-400 max-w-2xl">
+              Casjoe Local AI runs 100% offline. To update your desktop app to the latest version, click below to visit our official GitHub Releases page. Download the new installer (<code className="text-amber-400">.exe</code>) and run it to update your software without losing your local database or chat history.
+            </p>
+          </div>
+          
+          <a 
+            href="https://github.com/okparacasperjoe/casjoelocalai/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-gold text-xs py-2.5 px-5 flex items-center gap-2 whitespace-nowrap"
+          >
+            <Download className="w-4 h-4" />
+            <span>Check GitHub Releases for Updates</span>
+            <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+          </a>
+        </div>
+      </div>
+
       {/* Offline Data Management */}
       <div className="bg-[#0E1629] border border-white/10 p-6 rounded-2xl space-y-4">
         <h3 className="font-bold text-white font-['Outfit'] text-base border-b border-white/10 pb-3">
@@ -384,7 +417,7 @@ export default function SettingsView({ ollamaConnected, ollamaModels, selectedMo
           
           <button 
             onClick={handleExportDatabase}
-            className="bg-[#1F2937] hover:bg-[#374151] border border-gray-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap"
+            className="bg-[#1F2937] hover:bg-[#374151] border border-gray-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap cursor-pointer"
           >
             <HardDrive className="w-4 h-4 text-amber-500" />
             Export Backup to USB

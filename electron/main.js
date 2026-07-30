@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -21,6 +21,15 @@ function createWindow() {
       contextIsolation: false,
       webSecurity: false // Necessary for local file loading via file:// if CORS is an issue, but we'll try to keep it simple.
     }
+  });
+
+  // Handle external link clicks by opening in user's default browser
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http:') || url.startsWith('https:')) {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    }
+    return { action: 'allow' };
   });
 
   if (isDev) {
