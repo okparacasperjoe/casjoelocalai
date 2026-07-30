@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "main": "electron/main.js",
-  "author": "Casjoe",
+  "author": "Casper Joe Okpara <casperjoeproduction@gmail.com>",
   "description": "Casjoe Offline AI Desktop App",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "electron:dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
     "electron:build": "vite build && electron-builder",
-    "electron:build:linux": "vite build && electron-builder --linux"
+    "electron:build:linux": "vite build && electron-builder --linux tar.gz deb"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
@@ -57,7 +57,7 @@
       "icon": "build/icon.png"
     },
     "linux": {
-      "target": ["AppImage", "deb", "tar.gz"],
+      "target": ["tar.gz", "deb", "zip"],
       "category": "Utility"
     }
   }
