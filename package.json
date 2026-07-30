@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "electron:dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
     "electron:build": "vite build && electron-builder",
-    "electron:build:linux": "vite build && electron-builder --linux tar.gz deb"
+    "electron:build:linux": "vite build && electron-builder --linux tar.gz zip"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
@@ -57,7 +57,7 @@
       "icon": "build/icon.png"
     },
     "linux": {
-      "target": ["tar.gz", "deb", "zip"],
+      "target": ["tar.gz", "zip"],
       "category": "Utility"
     }
   }
