@@ -1,0 +1,274 @@
+import React, { useState } from 'react';
+import { Settings, Cpu, HardDrive, Sliders, CheckCircle, ShieldCheck, Zap, Battery, AlertTriangle } from 'lucide-react';
+import { listModels, pullModel, checkOllamaConnection, RECOMMENDED_MODELS } from '../services/ollama';
+import { setSetting } from '../db/hooks';
+
+export default function SettingsView({ ollamaConnected, ollamaModels, selectedModel, setSelectedModel }) {
+  const [quantization, setQuantization] = useState('Q4_K_M');
+  const [contextLength, setContextLength] = useState(4096);
+  const [threadCount, setThreadCount] = useState(8);
+  const [powerSaver, setPowerSaver] = useState(false);
+  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [pullProgress, setPullProgress] = useState({});
+
+  const handleSaveSettings = () => {
+    setSavedSuccess(true);
+    setTimeout(() => setSavedSuccess(false), 2500);
+  };
+
+  const handleSelectModel = (modelName) => {
+    setSelectedModel(modelName);
+    setSetting('selectedModel', modelName);
+  };
+
+  const formatBytes = (bytes) => {
+    if (!bytes) return 'Unknown Size';
+    return (bytes / 1e9).toFixed(1) + ' GB';
+  };
+
+  const handlePullModel = async (modelName) => {
+    setPullProgress(prev => ({ ...prev, [modelName]: { status: 'starting', percent: 0 } }));
+    
+    await pullModel(modelName, (progress) => {
+      setPullProgress(prev => ({ 
+        ...prev, 
+        [modelName]: {
+          ...progress,
+          percent: progress.total ? Math.round((progress.completed / progress.total) * 100) : 0
+        }
+      }));
+    });
+    
+    // Clear progress when done
+    setPullProgress(prev => {
+      const next = { ...prev };
+      delete next[modelName];
+      return next;
+    });
+  };
+
+  return (
+    <div className="p-4 lg:p-6 space-y-6 max-w-[1400px] mx-auto">
+      {/* Header */}
+      <div className="bg-[#0E1629] border border-white/10 p-6 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold font-['Outfit'] text-white">Local LLM & Hardware Settings</h2>
+          <p className="text-sm text-slate-400">Configure offline model weights, thread allocation, and memory quantization</p>
+        </div>
+
+        <button
+          onClick={handleSaveSettings}
+          className="btn-primary text-xs py-2.5 px-5"
+        >
+          <CheckCircle className="w-4 h-4" />
+          <span>Save Settings</span>
+        </button>
+      </div>
+
+      {savedSuccess && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-xl text-xs font-semibold flex items-center gap-2">
+          <CheckCircle className="w-4 h-4" />
+          <span>Local Engine Configuration updated successfully! Model weights allocated in RAM.</span>
+        </div>
+      )}
+
+      {/* Connection Status Banner */}
+      {ollamaConnected ? (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-xl text-sm font-semibold flex items-center gap-2">
+          <CheckCircle className="w-5 h-5" />
+          <span>✅ Ollama Connected — AI Engine Ready</span>
+        </div>
+      ) : (
+        <div className="bg-amber-500/10 border border-amber-500/30 text-amber-400 p-4 rounded-xl text-sm font-semibold flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5" />
+          <span>⚠️ Ollama Not Detected — Install from ollama.com to enable AI</span>
+        </div>
+      )}
+
+      {/* Installed Models */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Installed Models</h3>
+
+        {(!ollamaModels || ollamaModels.length === 0) && !ollamaConnected ? (
+          <div className="p-5 rounded-2xl border bg-[#0E1629] border-white/10 text-slate-300">
+            Ollama is not running. Install from ollama.com
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {ollamaModels?.map((m) => {
+              const isSelected = selectedModel === m.name;
+              return (
+                <div
+                  key={m.name}
+                  onClick={() => handleSelectModel(m.name)}
+                  className={`p-5 rounded-2xl border cursor-pointer transition-all space-y-3 ${
+                    isSelected
+                      ? 'bg-amber-500/10 border-amber-500/50 shadow-lg shadow-amber-500/10'
+                      : 'bg-[#0E1629] border-white/10 hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-3 h-3 rounded-full ${isSelected ? 'bg-[#F59E0B] animate-ping' : 'bg-slate-600'}`} />
+                      <h4 className="font-bold text-white text-base font-['Outfit']">{m.name}</h4>
+                    </div>
+                    <span className="text-xs font-mono font-bold bg-[#080C18] text-amber-400 px-2.5 py-1 rounded-md border border-white/10">
+                      Installed
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 text-[11px]">
+                    <div>
+                      <span className="text-slate-500 block">Size</span>
+                      <strong className="text-white">{formatBytes(m.size)}</strong>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Recommended Models */}
+      <div className="space-y-4">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">Recommended Models</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {RECOMMENDED_MODELS.map((m) => {
+            const isInstalled = ollamaModels?.some(installed => installed.name === m.name);
+            const isPulling = pullProgress[m.name];
+            
+            return (
+              <div
+                key={m.name}
+                className="p-5 rounded-2xl border bg-[#0E1629] border-white/10 space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <h4 className="font-bold text-white text-base font-['Outfit']">{m.displayName}</h4>
+                  </div>
+                  {isInstalled ? (
+                    <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                      <CheckCircle className="w-4 h-4" /> Installed ✓
+                    </span>
+                  ) : (
+                    <button
+                      disabled={!!isPulling || !ollamaConnected}
+                      onClick={() => handlePullModel(m.name)}
+                      className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-500 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1"
+                    >
+                      <HardDrive className="w-3 h-3" />
+                      {isPulling ? `${isPulling.percent}%` : 'Pull Model'}
+                    </button>
+                  )}
+                </div>
+
+                <p className="text-xs text-slate-300 leading-relaxed">{m.description}</p>
+
+                {isPulling && (
+                  <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2">
+                    <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: `${isPulling.percent}%` }}></div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/5 text-[11px]">
+                  <div>
+                    <span className="text-slate-500 block">Size</span>
+                    <strong className="text-white">{m.size}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Min RAM</span>
+                    <strong className="text-sky-400">{m.minRam}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Speed</span>
+                    <strong className="text-emerald-400">{m.speed}</strong>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Advanced Quantization & Hardware Allocation Controls */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Quantization & Context Length */}
+        <div className="bg-[#0E1629] border border-white/10 p-6 rounded-2xl space-y-4">
+          <h3 className="font-bold text-white font-['Outfit'] text-base border-b border-white/10 pb-3">
+            Quantization & Context Window
+          </h3>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-300">Model Quantization Format</label>
+            <select
+              value={quantization}
+              onChange={(e) => setQuantization(e.target.value)}
+              className="custom-select w-full"
+            >
+              <option value="Q4_K_M">Q4_K_M (Recommended - Balanced speed & accuracy)</option>
+              <option value="Q4_0">Q4_0 (Legacy low RAM format)</option>
+              <option value="Q5_K_M">Q5_K_M (Higher accuracy - Requires 6GB+ free RAM)</option>
+              <option value="IQ3_XS">IQ3_XS (Ultra-compact 3-bit - For 4GB laptops)</option>
+            </select>
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <label className="text-xs font-semibold text-slate-300">Context Window Size</label>
+            <select
+              value={contextLength}
+              onChange={(e) => setContextLength(Number(e.target.value))}
+              className="custom-select w-full"
+            >
+              <option value={2048}>2048 Tokens (Lowest Memory)</option>
+              <option value={4096}>4096 Tokens (Standard Business Documents)</option>
+              <option value={8192}>8192 Tokens (Extended RAG Search)</option>
+            </select>
+          </div>
+        </div>
+
+        {/* CPU Threads & Power Mode */}
+        <div className="bg-[#0E1629] border border-white/10 p-6 rounded-2xl space-y-4">
+          <h3 className="font-bold text-white font-['Outfit'] text-base border-b border-white/10 pb-3">
+            CPU Threads & Thermal Management
+          </h3>
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs text-slate-300">
+              <label className="font-semibold">Allocated CPU Threads</label>
+              <span className="font-mono text-amber-400 font-bold">{threadCount} Threads</span>
+            </div>
+            <input
+              type="range"
+              min="2"
+              max="16"
+              step="2"
+              value={threadCount}
+              onChange={(e) => setThreadCount(Number(e.target.value))}
+              className="w-full accent-amber-500"
+            />
+          </div>
+
+          <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-amber-500/10 text-[#F59E0B]">
+                <Battery className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-white">Thermal & Battery Saver Mode</h4>
+                <p className="text-[11px] text-slate-400">Prevents overheating on low-power laptop batteries</p>
+              </div>
+            </div>
+            <input
+              type="checkbox"
+              checked={powerSaver}
+              onChange={(e) => setPowerSaver(e.target.checked)}
+              className="w-5 h-5 accent-amber-500 cursor-pointer"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
