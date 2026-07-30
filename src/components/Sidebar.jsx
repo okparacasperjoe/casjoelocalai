@@ -4,7 +4,6 @@ import { LayoutDashboard, Users, Wallet, Sparkles, FileText, Cpu, Settings, Play
 export default function Sidebar({ activeTab, setActiveTab }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'demo', label: 'Live Demo', icon: PlayCircle },
     { id: 'crm', label: 'CRM', icon: Users },
     { id: 'finance', label: 'Finance', icon: Wallet },
     { id: 'chat', label: 'AI Chat', icon: Sparkles },

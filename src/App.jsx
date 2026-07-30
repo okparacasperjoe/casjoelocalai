@@ -9,7 +9,6 @@ import CRMView from './components/CRMView';
 import FinanceView from './components/FinanceView';
 import SettingsView from './components/SettingsView';
 import Modals from './components/Modals';
-import DemoView from './components/DemoView';
 import OnboardingWizard from './components/OnboardingWizard';
 
 import { useCustomers, useInvoices, useDocuments, useStats } from './db/hooks';
@@ -124,8 +123,6 @@ export default function App() {
               onOpenUploadModal={() => setActiveModal('uploadDoc')}
             />
           )}
-
-          {activeTab === 'demo' && <DemoView />}
 
           {activeTab === 'chat' && (
             <ChatView
