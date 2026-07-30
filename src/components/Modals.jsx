@@ -70,7 +70,22 @@ export default function Modals({ activeModal, onCloseModal }) {
   const handleInvoiceSubmit = async (e) => {
     e.preventDefault();
     confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-    const symbol = invoiceData.currency === 'NGN' ? '₦' : invoiceData.currency === 'KES' ? 'KSh ' : invoiceData.currency === 'GHS' ? 'GHS ' : '$';
+    
+    let symbol = '$';
+    switch(invoiceData.currency) {
+      case 'NGN': symbol = '₦'; break;
+      case 'GHS': symbol = 'GH₵ '; break;
+      case 'KES': symbol = 'KSh '; break;
+      case 'ZAR': symbol = 'R '; break;
+      case 'RWF': symbol = 'FRw '; break;
+      case 'EGP': symbol = 'E£ '; break;
+      case 'MAD': symbol = 'DH '; break;
+      case 'UGX': symbol = 'USh '; break;
+      case 'TZS': symbol = 'TSh '; break;
+      case 'XOF': symbol = 'CFA '; break;
+      case 'ETB': symbol = 'Br '; break;
+    }
+    
     await addInvoice({
       id: 'INV-2026-00' + Math.floor(Math.random() * 90 + 10),
       customer: invoiceData.customer,
@@ -229,9 +244,17 @@ export default function Modals({ activeModal, onCloseModal }) {
                   onChange={(e) => setInvoiceData({ ...invoiceData, currency: e.target.value })}
                   className="custom-select w-full"
                 >
-                  <option value="NGN">NGN (₦)</option>
-                  <option value="KES">KES (KSh)</option>
-                  <option value="GHS">GHS</option>
+                  <option value="NGN">NGN (Nigeria)</option>
+                  <option value="GHS">GHS (Ghana)</option>
+                  <option value="KES">KES (Kenya)</option>
+                  <option value="ZAR">ZAR (South Africa)</option>
+                  <option value="RWF">RWF (Rwanda)</option>
+                  <option value="EGP">EGP (Egypt)</option>
+                  <option value="MAD">MAD (Morocco)</option>
+                  <option value="UGX">UGX (Uganda)</option>
+                  <option value="TZS">TZS (Tanzania)</option>
+                  <option value="XOF">XOF (Senegal/Ivory Coast)</option>
+                  <option value="ETB">ETB (Ethiopia)</option>
                   <option value="USD">USD ($)</option>
                 </select>
               </div>

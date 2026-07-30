@@ -8,9 +8,16 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
   const getCurrencySymbol = (curr) => {
     switch (curr) {
       case 'NGN': return '₦';
+      case 'GHS': return 'GH₵ ';
       case 'KES': return 'KSh ';
-      case 'GHS': return 'GHS ';
-      case 'ZAR': return 'R';
+      case 'ZAR': return 'R ';
+      case 'RWF': return 'FRw ';
+      case 'EGP': return 'E£ ';
+      case 'MAD': return 'DH ';
+      case 'UGX': return 'USh ';
+      case 'TZS': return 'TSh ';
+      case 'XOF': return 'CFA ';
+      case 'ETB': return 'Br ';
       default: return '$';
     }
   };
@@ -19,9 +26,16 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
     // Rough mock exchange rates against NGN base
     const rates = {
       NGN: 1,
-      KES: 0.081,
       GHS: 0.0095,
+      KES: 0.081,
       ZAR: 0.012,
+      RWF: 0.85,
+      EGP: 0.031,
+      MAD: 0.0063,
+      UGX: 2.45,
+      TZS: 1.62,
+      XOF: 0.38,
+      ETB: 0.035,
       USD: 0.00063
     };
     
@@ -44,11 +58,18 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
             onChange={(e) => setSelectedCurrency(e.target.value)}
             className="custom-select text-xs font-bold"
           >
-            <option value="NGN">₦ NGN (Naira)</option>
-            <option value="KES">KSh KES (Shilling)</option>
-            <option value="GHS">GHS (Cedi)</option>
-            <option value="ZAR">ZAR (Rand)</option>
-            <option value="USD">$ USD (Dollar)</option>
+            <option value="NGN">₦ NGN (Nigeria)</option>
+            <option value="GHS">GH₵ GHS (Ghana)</option>
+            <option value="KES">KSh KES (Kenya)</option>
+            <option value="ZAR">R ZAR (South Africa)</option>
+            <option value="RWF">FRw RWF (Rwanda)</option>
+            <option value="EGP">E£ EGP (Egypt)</option>
+            <option value="MAD">DH MAD (Morocco)</option>
+            <option value="UGX">USh UGX (Uganda)</option>
+            <option value="TZS">TSh TZS (Tanzania)</option>
+            <option value="XOF">CFA XOF (Senegal/Ivory Coast)</option>
+            <option value="ETB">Br ETB (Ethiopia)</option>
+            <option value="USD">$ USD (Global)</option>
           </select>
 
           <button
