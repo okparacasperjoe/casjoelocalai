@@ -8,11 +8,25 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
   const getCurrencySymbol = (curr) => {
     switch (curr) {
       case 'NGN': return '₦';
-      case 'KES': return 'KSh';
-      case 'GHS': return 'GHS';
-      case 'ZAR': return 'ZAR';
+      case 'KES': return 'KSh ';
+      case 'GHS': return 'GHS ';
+      case 'ZAR': return 'R';
       default: return '$';
     }
+  };
+
+  const convertAndFormat = (amountNgn) => {
+    // Rough mock exchange rates against NGN base
+    const rates = {
+      NGN: 1,
+      KES: 0.081,
+      GHS: 0.0095,
+      ZAR: 0.012,
+      USD: 0.00063
+    };
+    
+    const converted = amountNgn * rates[selectedCurrency];
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(converted);
   };
 
   return (
@@ -52,7 +66,7 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
         <div className="bg-[#0E1629] border border-white/10 p-5 rounded-2xl space-y-2">
           <span className="text-xs font-medium text-slate-400">Total Invoiced (This Month)</span>
           <div className="text-2xl lg:text-3xl font-extrabold font-['Outfit'] text-white">
-            {getCurrencySymbol(selectedCurrency)}12,400,000
+            {getCurrencySymbol(selectedCurrency)}{convertAndFormat(12400000)}
           </div>
           <span className="text-xs text-emerald-400 font-semibold">+18.5% vs last month</span>
         </div>
@@ -60,7 +74,7 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
         <div className="bg-[#0E1629] border border-white/10 p-5 rounded-2xl space-y-2">
           <span className="text-xs font-medium text-slate-400">Collected Revenue</span>
           <div className="text-2xl lg:text-3xl font-extrabold font-['Outfit'] text-emerald-400">
-            {getCurrencySymbol(selectedCurrency)}9,800,000
+            {getCurrencySymbol(selectedCurrency)}{convertAndFormat(9800000)}
           </div>
           <span className="text-xs text-slate-400">Paid into local accounts</span>
         </div>
@@ -68,7 +82,7 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
         <div className="bg-[#0E1629] border border-white/10 p-5 rounded-2xl space-y-2">
           <span className="text-xs font-medium text-slate-400">Pending Receivables</span>
           <div className="text-2xl lg:text-3xl font-extrabold font-['Outfit'] text-amber-400">
-            {getCurrencySymbol(selectedCurrency)}2,600,000
+            {getCurrencySymbol(selectedCurrency)}{convertAndFormat(2600000)}
           </div>
           <span className="text-xs text-amber-400 font-semibold">2 Invoices Due</span>
         </div>

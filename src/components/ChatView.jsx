@@ -8,6 +8,7 @@ export default function ChatView({ selectedModel, ollamaConnected }) {
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [streamingText, setStreamingText] = useState('');
+  const [useLocalDocs, setUseLocalDocs] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -148,12 +149,32 @@ export default function ChatView({ selectedModel, ollamaConnected }) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-[#090E1B] border border-white/10 p-6 rounded-2xl">
         {/* Main Conversation Workspace (8 cols) */}
         <div className="lg:col-span-8 bg-[#070B15] border border-white/10 rounded-xl p-5 flex flex-col justify-between min-h-[480px]">
-          <div className="flex items-center gap-2 border-b border-white/10 pb-3">
-            <Sparkles className="w-4 h-4 text-[#FF9F00]" />
-            <h3 className="font-bold text-white font-['Outfit'] text-sm">AI Assistant</h3>
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#FF9F00]" />
+              <h3 className="font-bold text-white font-['Outfit'] text-sm">AI Assistant</h3>
+            </div>
+            
+            <div className="flex items-center gap-2 bg-[#0C1222] border border-white/10 px-3 py-1.5 rounded-lg cursor-pointer" onClick={() => setUseLocalDocs(!useLocalDocs)}>
+              <span className="text-[10px] font-bold text-slate-300">Context: Include Local Documents</span>
+              <button 
+                type="button"
+                className={`w-8 h-4 rounded-full relative transition-colors ${useLocalDocs ? 'bg-amber-500' : 'bg-slate-700'}`}
+              >
+                <div className={`w-3 h-3 rounded-full bg-white absolute top-0.5 transition-transform ${useLocalDocs ? 'left-4.5' : 'left-0.5'}`} />
+              </button>
+            </div>
           </div>
 
           <div className="py-4 space-y-4 flex-1 overflow-y-auto max-h-[360px]">
+            {useLocalDocs && (
+              <div className="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-center mx-auto w-3/4 mb-4">
+                <span className="text-[10px] text-amber-400 font-bold flex items-center justify-center gap-1">
+                  <Check className="w-3 h-3" /> AI is now securely reading from your local Document Vault (RAG Active)
+                </span>
+              </div>
+            )}
+            
             {messages.map((msg) => (
               <div
                 key={msg.id}

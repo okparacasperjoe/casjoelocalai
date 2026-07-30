@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Settings, Cpu, HardDrive, Sliders, CheckCircle, ShieldCheck, Zap, Battery, AlertTriangle } from 'lucide-react';
 import { listModels, pullModel, checkOllamaConnection, RECOMMENDED_MODELS } from '../services/ollama';
 import { setSetting } from '../db/hooks';
+import db from '../db/database';
 
 export default function SettingsView({ ollamaConnected, ollamaModels, selectedModel, setSelectedModel }) {
   const [quantization, setQuantization] = useState('Q4_K_M');
@@ -14,6 +15,30 @@ export default function SettingsView({ ollamaConnected, ollamaModels, selectedMo
   const handleSaveSettings = () => {
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
+  };
+
+  const handleExportDatabase = async () => {
+    try {
+      const exportData = {
+        customers: await db.customers.toArray(),
+        invoices: await db.invoices.toArray(),
+        chatMessages: await db.chatMessages.toArray(),
+        documents: await db.documents.toArray(),
+        settings: await db.settings.toArray(),
+        exportDate: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Casjoe_Offline_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export database', error);
+      alert('Backup failed.');
+    }
   };
 
   const handleSelectModel = (modelName) => {
@@ -267,6 +292,28 @@ export default function SettingsView({ ollamaConnected, ollamaModels, selectedMo
               className="w-5 h-5 accent-amber-500 cursor-pointer"
             />
           </div>
+        </div>
+      </div>
+
+      {/* Offline Data Management */}
+      <div className="bg-[#0E1629] border border-white/10 p-6 rounded-2xl space-y-4">
+        <h3 className="font-bold text-white font-['Outfit'] text-base border-b border-white/10 pb-3">
+          Offline Data Management & Backup
+        </h3>
+        
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h4 className="text-sm font-bold text-white">Full System Backup</h4>
+            <p className="text-xs text-slate-400">Export your entire local IndexedDB (CRM, Invoices, Chat History, Settings) to a single JSON file. Save this to a USB drive for disaster recovery.</p>
+          </div>
+          
+          <button 
+            onClick={handleExportDatabase}
+            className="bg-[#1F2937] hover:bg-[#374151] border border-gray-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 whitespace-nowrap"
+          >
+            <HardDrive className="w-4 h-4 text-amber-500" />
+            Export Backup to USB
+          </button>
         </div>
       </div>
     </div>
