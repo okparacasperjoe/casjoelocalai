@@ -8,10 +8,11 @@ import ChatView from './components/ChatView';
 import CRMView from './components/CRMView';
 import FinanceView from './components/FinanceView';
 import SettingsView from './components/SettingsView';
+import InventoryView from './components/InventoryView';
 import Modals from './components/Modals';
 import OnboardingWizard from './components/OnboardingWizard';
 
-import { useCustomers, useInvoices, useDocuments, useStats } from './db/hooks';
+import { useCustomers, useInvoices, useDocuments, useInventory, useStats } from './db/hooks';
 import { checkOllamaConnection, listModels, RECOMMENDED_MODELS } from './services/ollama';
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
   const customers = useCustomers() || [];
   const invoices = useInvoices() || [];
   const documents = useDocuments() || [];
+  const inventory = useInventory() || [];
 
   // Modal State
   const [activeModal, setActiveModal] = useState(null);
@@ -144,6 +146,13 @@ export default function App() {
             <FinanceView
               invoices={invoices}
               onOpenCreateInvoice={() => setActiveModal('createInvoice')}
+            />
+          )}
+
+          {activeTab === 'inventory' && (
+            <InventoryView
+              inventory={inventory}
+              onOpenAddModal={() => setActiveModal('addInventory')}
             />
           )}
 

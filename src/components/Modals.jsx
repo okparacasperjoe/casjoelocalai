@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, UserPlus, FileText, CheckSquare, Sparkles, Upload, CheckCircle2, Building2, MapPin, Phone, DollarSign } from 'lucide-react';
+import { X, UserPlus, FileText, CheckSquare, Sparkles, Upload, CheckCircle2, Building2, MapPin, Phone, DollarSign, Package } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { addCustomer, addInvoice, addDocument } from '../db/hooks';
+import { addCustomer, addInvoice, addDocument, addInventoryItem } from '../db/hooks';
 
 export default function Modals({ activeModal, onCloseModal }) {
   if (!activeModal) return null;
@@ -13,6 +13,16 @@ export default function Modals({ activeModal, onCloseModal }) {
     location: 'Lagos, Nigeria',
     phone: '',
     totalSpent: '₦0'
+  });
+
+  // Add Inventory State
+  const [inventoryData, setInventoryData] = useState({
+    sku: '',
+    name: '',
+    category: 'Hardware',
+    quantity: '0',
+    price: '0',
+    location: 'Lagos Warehouse',
   });
 
   // Create Invoice State
@@ -41,6 +51,18 @@ export default function Modals({ activeModal, onCloseModal }) {
       id: 'c-' + Date.now(),
       ...customerData,
       status: 'Active'
+    });
+    onCloseModal();
+  };
+
+  const handleInventorySubmit = async (e) => {
+    e.preventDefault();
+    if (!inventoryData.name || !inventoryData.sku) return;
+    const qty = parseInt(inventoryData.quantity, 10);
+    const status = qty === 0 ? 'Out of Stock' : qty < 15 ? 'Low Stock' : 'In Stock';
+    await addInventoryItem({
+      ...inventoryData,
+      status
     });
     onCloseModal();
   };
@@ -96,6 +118,7 @@ export default function Modals({ activeModal, onCloseModal }) {
               {activeModal === 'addTask' && <CheckSquare className="w-4 h-4" />}
               {activeModal === 'aiReport' && <Sparkles className="w-4 h-4" />}
               {activeModal === 'uploadDoc' && <Upload className="w-4 h-4" />}
+              {activeModal === 'addInventory' && <Package className="w-4 h-4" />}
             </div>
             <h3 className="font-bold text-white font-['Outfit'] text-lg">
               {activeModal === 'addCustomer' && 'Add New Customer'}
@@ -103,6 +126,7 @@ export default function Modals({ activeModal, onCloseModal }) {
               {activeModal === 'addTask' && 'Add Action Task'}
               {activeModal === 'aiReport' && 'Generate AI Report'}
               {activeModal === 'uploadDoc' && 'Upload Local Document'}
+              {activeModal === 'addInventory' && 'Add Inventory Item'}
             </h3>
           </div>
           <button onClick={onCloseModal} className="text-slate-400 hover:text-white">
@@ -318,6 +342,97 @@ export default function Modals({ activeModal, onCloseModal }) {
             <div className="flex justify-end gap-3 pt-2">
               <button type="button" onClick={onCloseModal} className="btn-secondary text-xs">Cancel</button>
               <button type="submit" className="btn-primary text-xs">Vectorize Document Offline</button>
+            </div>
+          </form>
+        )}
+
+        {/* Modal 6: Add Inventory */}
+        {activeModal === 'addInventory' && (
+          <form onSubmit={handleInventorySubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs text-slate-300 font-semibold">SKU</label>
+                <input
+                  type="text"
+                  required
+                  value={inventoryData.sku}
+                  onChange={(e) => setInventoryData({ ...inventoryData, sku: e.target.value })}
+                  placeholder="e.g. SKU-100"
+                  className="custom-input"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-slate-300 font-semibold">Product Name</label>
+                <input
+                  type="text"
+                  required
+                  value={inventoryData.name}
+                  onChange={(e) => setInventoryData({ ...inventoryData, name: e.target.value })}
+                  placeholder="e.g. 16GB RAM Kit"
+                  className="custom-input"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs text-slate-300 font-semibold">Category</label>
+                <select
+                  value={inventoryData.category}
+                  onChange={(e) => setInventoryData({ ...inventoryData, category: e.target.value })}
+                  className="custom-select w-full"
+                >
+                  <option value="Hardware">Hardware</option>
+                  <option value="Software">Software</option>
+                  <option value="Components">Components</option>
+                  <option value="Accessories">Accessories</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-slate-300 font-semibold">Location</label>
+                <select
+                  value={inventoryData.location}
+                  onChange={(e) => setInventoryData({ ...inventoryData, location: e.target.value })}
+                  className="custom-select w-full"
+                >
+                  <option value="Lagos Warehouse">Lagos Warehouse</option>
+                  <option value="Kano Branch">Kano Branch</option>
+                  <option value="Accra Branch">Accra Branch</option>
+                  <option value="Nairobi Branch">Nairobi Branch</option>
+                  <option value="Digital">Digital / License</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs text-slate-300 font-semibold">Quantity</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={inventoryData.quantity}
+                  onChange={(e) => setInventoryData({ ...inventoryData, quantity: e.target.value })}
+                  className="custom-input"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-slate-300 font-semibold">Unit Price (₦)</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  step="0.01"
+                  value={inventoryData.price}
+                  onChange={(e) => setInventoryData({ ...inventoryData, price: e.target.value })}
+                  className="custom-input"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-3">
+              <button type="button" onClick={onCloseModal} className="btn-secondary text-xs">Cancel</button>
+              <button type="submit" className="btn-primary text-xs">Save Item</button>
             </div>
           </form>
         )}

@@ -12,6 +12,10 @@ db.version(1).stores({
   settings: 'key, value'
 });
 
+db.version(2).stores({
+  inventory: '++id, sku, name, category, quantity, price, location, status, createdAt'
+});
+
 /**
  * Seeds the database with initial mock data if the tables are empty.
  */
@@ -51,6 +55,18 @@ export const initializeDatabase = async () => {
         { name: 'Sales_Report.xlsx', size: '985 KB', type: 'xlsx', pages: 4, date: '2026-07-28', summary: 'Quarterly breakdown of sales performance across Lagos, Abuja, Port Harcourt & Kano branches.', createdAt: now },
         { name: 'Operations_Manual.pdf', size: '3.1 MB', type: 'pdf', pages: 32, date: '2026-06-10', summary: 'Hardware setup, offline model installation guide, thermal management on 8GB laptops.', createdAt: now },
         { name: 'Strategy_Deck.docx', size: '2.7 MB', type: 'docx', pages: 15, date: '2026-07-02', summary: '2026 expansion roadmap across West & East African SME hubs with 0% cloud cost.', createdAt: now }
+      ]);
+    }
+
+    // Check and seed inventory
+    const inventoryCount = await db.inventory.count();
+    if (inventoryCount === 0) {
+      await db.inventory.bulkAdd([
+        { sku: 'SKU-001', name: 'Casjoe Local AI Hub', category: 'Hardware', quantity: 45, price: '850000', location: 'Lagos Warehouse', status: 'In Stock', createdAt: now },
+        { sku: 'SKU-002', name: '8GB RAM Upgrade Kit', category: 'Components', quantity: 120, price: '45000', location: 'Lagos Warehouse', status: 'In Stock', createdAt: now },
+        { sku: 'SKU-003', name: 'Offline Solar Router', category: 'Hardware', quantity: 12, price: '120000', location: 'Kano Branch', status: 'Low Stock', createdAt: now },
+        { sku: 'SKU-004', name: 'Medical RAG License', category: 'Software', quantity: 999, price: '250000', location: 'Digital', status: 'In Stock', createdAt: now },
+        { sku: 'SKU-005', name: 'Thermal Cooling Pad', category: 'Accessories', quantity: 0, price: '15000', location: 'Accra Branch', status: 'Out of Stock', createdAt: now }
       ]);
     }
   } catch (error) {

@@ -26,6 +26,13 @@ export const useDocuments = () => {
   );
 };
 
+export const useInventory = () => {
+  return useLiveQuery(
+    () => db.inventory.orderBy('createdAt').reverse().toArray(),
+    []
+  );
+};
+
 export const useChatMessages = (conversationId) => {
   return useLiveQuery(
     () => db.chatMessages
@@ -42,9 +49,10 @@ export const useStats = () => {
     const invoices = await db.invoices.count();
     const documents = await db.documents.count();
     const chatMessages = await db.chatMessages.count();
+    const inventory = await db.inventory.count();
     
-    return { customers, invoices, documents, chatMessages };
-  }, [], { customers: 0, invoices: 0, documents: 0, chatMessages: 0 }); // Initial value
+    return { customers, invoices, documents, chatMessages, inventory };
+  }, [], { customers: 0, invoices: 0, documents: 0, chatMessages: 0, inventory: 0 }); // Initial value
 };
 
 export const useSetting = (key) => {
@@ -87,6 +95,13 @@ export const addDocument = async (data) => {
   });
 };
 
+export const addInventoryItem = async (data) => {
+  return db.inventory.add({
+    ...data,
+    createdAt: new Date().toISOString()
+  });
+};
+
 export const addChatMessage = async (data) => {
   return db.chatMessages.add({
     ...data,
@@ -108,4 +123,8 @@ export const deleteInvoice = async (id) => {
 
 export const deleteDocument = async (id) => {
   return db.documents.delete(id);
+};
+
+export const deleteInventoryItem = async (id) => {
+  return db.inventory.delete(id);
 };
