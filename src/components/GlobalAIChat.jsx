@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, Loader2, X } from 'lucide-react';
 import { agentChat } from '../services/ollama';
 import db from '../db/database';
