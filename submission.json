@@ -1,6 +1,6 @@
 {
   "team_id": "casjoe-offline-ai",
-  "domain": "corporate_and_enterprise",
+  "domain": ["corporate_and_enterprise", "autonomous_ai_agents"],
   "language_scope": ["en"],
   "african_alpha_claim": true,
   "budget_laptop_claim": true,
@@ -12,7 +12,7 @@
   "cross_disciplinary_pairing": {
     "discipline": "business_and_finance",
     "load_bearing": true,
-    "description": "The AI serves as a direct business management tool, automatically reading documents and generating actionable financial records (like invoices) to help African SMEs operate efficiently without internet."
+    "description": "We cross over two major domains: Corporate & Enterprise and Autonomous AI Agents. The AI serves as an autonomous agentic business management tool, automatically reading documents and taking autonomous action (like generating actionable financial records) to help African SMEs operate efficiently without internet."
   },
   "test_prompts": [
     {
