@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, X } from 'lucide-react';
 import { agentChat } from '../services/ollama';
 import db from '../db/database';
 
 export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
   const [command, setCommand] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [feedback, setFeedback] = useState(null); // { text: string, type: 'success' | 'error' }
+  const [feedback, setFeedback] = useState(null); // { text: string, type: 'success' | 'error' | 'chat' }
 
   const tools = [
     {
@@ -41,6 +41,22 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
           required: ["name", "company"]
         }
       }
+    },
+    {
+      type: "function",
+      function: {
+        name: "add_document",
+        description: "Add a document, lesson plan, or healthcare policy to the system.",
+        parameters: {
+          type: "object",
+          properties: {
+            name: { type: "string", description: "Name of the document (e.g. Lesson Plan 1, Patient Protocol)" },
+            summary: { type: "string", description: "Summary of the document contents" },
+            type: { type: "string", description: "Document type (pdf, docx, txt)" }
+          },
+          required: ["name", "summary"]
+        }
+      }
     }
   ];
 
@@ -57,7 +73,7 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
       const messages = [
         { 
           role: 'system', 
-          content: 'You are an agentic AI assistant. If the user asks to add a customer or create an invoice, you MUST use the provided tools. Extract the required parameters from the user prompt.' 
+          content: 'You are Casjoe Offline AI, an agentic AI assistant designed to help entrepreneurs, students, and healthcare workers across Africa. If the user asks to add a customer, create an invoice, or add a document, you MUST use the provided tools. If the user asks a general question (e.g., educational, healthcare advice, or general conversation), DO NOT use tools. Just respond nicely with the answer directly in Markdown.' 
         },
         { role: 'user', content: userPrompt }
       ];
@@ -97,10 +113,22 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
             });
             setFeedback({ text: `Invoice ${generatedId} created for ${args.customer}!`, type: 'success' });
           }
+          else if (fn.name === 'add_document') {
+            await db.documents.add({
+              name: (args.name || 'Untitled') + '.' + (args.type || 'txt'),
+              size: '1.2 MB',
+              type: args.type || 'txt',
+              pages: 1,
+              date: new Date().toISOString().split('T')[0],
+              summary: args.summary || 'Added via AI Agent',
+              createdAt: new Date().toISOString()
+            });
+            setFeedback({ text: `Document '${args.name}' added successfully to the vault!`, type: 'success' });
+          }
         }
       } else {
-        // Model replied with plain text (didn't use a tool)
-        setFeedback({ text: response.content || "I didn't understand the command. Try 'Add customer John Doe from Acme Corp'", type: 'error' });
+        // Model replied with plain text (didn't use a tool, it's a chat response)
+        setFeedback({ text: response.content || "I didn't understand the command.", type: 'chat' });
       }
     } catch (err) {
       console.error(err);
@@ -108,8 +136,18 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
     }
 
     setIsProcessing(false);
-    setTimeout(() => setFeedback(null), 5000);
+    
+    // Only auto-close if it's a success/error toast. Chat stays open.
+    // We will clear toasts in a timeout, but not chat.
   };
+
+  useEffect(() => {
+    let timer;
+    if (feedback && (feedback.type === 'success' || feedback.type === 'error')) {
+      timer = setTimeout(() => setFeedback(null), 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [feedback]);
 
   return (
     <div className="flex-1 max-w-2xl mx-4 relative hidden lg:block">
@@ -144,17 +182,34 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
         </div>
       </form>
 
-      {/* Floating Feedback Toast */}
+      {/* Floating Feedback Panel */}
       {feedback && (
         <div className="absolute top-full left-0 right-0 mt-2 z-50 animate-fade-in-up">
-          <div className={`p-3 rounded-lg border flex items-center gap-3 text-sm font-bold shadow-xl ${
-            feedback.type === 'success' 
-              ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-400' 
-              : 'bg-red-950/90 border-red-500/50 text-red-400'
-          }`}>
-            <Sparkles className="w-4 h-4" />
-            {feedback.text}
-          </div>
+          {feedback.type === 'chat' ? (
+            <div className="bg-[#0A0F1D] border border-[#FF9F00]/50 rounded-xl shadow-2xl shadow-orange-500/10 overflow-hidden flex flex-col max-h-[60vh]">
+              <div className="bg-[#111A30] border-b border-white/5 px-4 py-2 flex justify-between items-center">
+                <span className="text-xs font-bold text-amber-500 flex items-center gap-2">
+                  <Sparkles className="w-3 h-3" />
+                  AI Agent Response
+                </span>
+                <button onClick={() => setFeedback(null)} className="text-slate-400 hover:text-white transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="p-4 text-sm text-slate-300 overflow-y-auto whitespace-pre-wrap leading-relaxed">
+                {feedback.text}
+              </div>
+            </div>
+          ) : (
+            <div className={`p-3 rounded-lg border flex items-center gap-3 text-sm font-bold shadow-xl ${
+              feedback.type === 'success' 
+                ? 'bg-emerald-950/90 border-emerald-500/50 text-emerald-400' 
+                : 'bg-red-950/90 border-red-500/50 text-red-400'
+            }`}>
+              <Sparkles className="w-4 h-4" />
+              {feedback.text}
+            </div>
+          )}
         </div>
       )}
     </div>
