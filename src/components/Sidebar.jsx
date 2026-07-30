@@ -1,13 +1,14 @@
 import React from 'react';
-import { LayoutDashboard, Users, Wallet, Sparkles, FileText, Cpu, Settings, Package } from 'lucide-react';
+import { LayoutDashboard, Users, Wallet, Sparkles, FileText, Cpu, Settings, Package, ShoppingCart } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'chat', label: 'AI Chat', icon: Sparkles },
     { id: 'crm', label: 'CRM', icon: Users },
     { id: 'finance', label: 'Finance', icon: Wallet },
     { id: 'inventory', label: 'Inventory', icon: Package },
-    { id: 'chat', label: 'AI Chat', icon: Sparkles },
+    { id: 'pos', label: 'Point of Sale', icon: ShoppingCart },
     { id: 'documents', label: 'Docs', icon: FileText },
     { id: 'performance', label: 'Performance', icon: Cpu },
     { id: 'settings', label: 'Settings', icon: Settings },

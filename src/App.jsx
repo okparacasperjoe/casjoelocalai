@@ -9,6 +9,7 @@ import CRMView from './components/CRMView';
 import FinanceView from './components/FinanceView';
 import SettingsView from './components/SettingsView';
 import InventoryView from './components/InventoryView';
+import POSView from './components/POSView';
 import Modals from './components/Modals';
 import OnboardingWizard from './components/OnboardingWizard';
 
@@ -154,6 +155,10 @@ export default function App() {
               inventory={inventory}
               onOpenAddModal={() => setActiveModal('addInventory')}
             />
+          )}
+
+          {activeTab === 'pos' && (
+            <POSView inventory={inventory} />
           )}
 
           {activeTab === 'settings' && (
