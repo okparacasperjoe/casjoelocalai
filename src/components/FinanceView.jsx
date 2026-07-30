@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
-import { CreditCard, FileText, Plus, DollarSign, ArrowUpRight, CheckCircle2, Clock, Sparkles, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { CreditCard, FileText, Plus, DollarSign, ArrowUpRight, CheckCircle2, Clock, Sparkles, Trash2, Printer } from 'lucide-react';
 import { deleteInvoice } from '../db/hooks';
+import InvoicePrintView from './InvoicePrintView';
 
 export default function FinanceView({ invoices, onOpenCreateInvoice }) {
   const [selectedCurrency, setSelectedCurrency] = useState('NGN');
+  const [printingInvoice, setPrintingInvoice] = useState(null);
+
+  // Trigger print dialog when printingInvoice is set
+  useEffect(() => {
+    if (printingInvoice) {
+      // Small timeout to allow the DOM to render the InvoicePrintView before calling print()
+      setTimeout(() => {
+        window.print();
+        // Clear it after printing so the regular view comes back
+        setPrintingInvoice(null);
+      }, 100);
+    }
+  }, [printingInvoice]);
 
   const getCurrencySymbol = (curr) => {
     switch (curr) {
@@ -144,8 +158,19 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
                       {inv.status}
                     </span>
                   </td>
-                  <td className="py-4 px-5 text-right">
-                    <button onClick={() => deleteInvoice(inv.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors">
+                  <td className="py-4 px-5 text-right flex items-center justify-end gap-2">
+                    <button 
+                      onClick={() => setPrintingInvoice(inv)} 
+                      className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded transition-colors"
+                      title="Download/Print PDF"
+                    >
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => deleteInvoice(inv.id)} 
+                      className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                      title="Delete Invoice"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
@@ -155,6 +180,9 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
           </table>
         </div>
       </div>
+      
+      {/* Hidden Print Layer */}
+      {printingInvoice && <InvoicePrintView invoice={printingInvoice} />}
     </div>
   );
 }

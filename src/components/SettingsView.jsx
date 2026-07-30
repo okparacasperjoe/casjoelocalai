@@ -12,7 +12,32 @@ export default function SettingsView({ ollamaConnected, ollamaModels, selectedMo
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [pullProgress, setPullProgress] = useState({});
 
+  // Business Profile State
+  const [businessName, setBusinessName] = useState('');
+  const [businessPhone, setBusinessPhone] = useState('');
+  const [businessEmail, setBusinessEmail] = useState('');
+  const [businessBank, setBusinessBank] = useState('');
+
+  // Load existing profile on mount
+  React.useEffect(() => {
+    db.settings.get('businessProfile').then(record => {
+      if (record && record.value) {
+        setBusinessName(record.value.name || '');
+        setBusinessPhone(record.value.phone || '');
+        setBusinessEmail(record.value.email || '');
+        setBusinessBank(record.value.bank || '');
+      }
+    });
+  }, []);
+
   const handleSaveSettings = () => {
+    setSetting('businessProfile', {
+      name: businessName,
+      phone: businessPhone,
+      email: businessEmail,
+      bank: businessBank
+    });
+
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2500);
   };
@@ -109,6 +134,56 @@ export default function SettingsView({ ollamaConnected, ollamaModels, selectedMo
           <span>⚠️ Ollama Not Detected — Install from ollama.com to enable AI</span>
         </div>
       )}
+
+      {/* Business Profile Settings */}
+      <div className="bg-[#0E1629] border border-white/10 p-6 rounded-2xl space-y-4">
+        <h3 className="font-bold text-white font-['Outfit'] text-base border-b border-white/10 pb-3">
+          Business Profile (For Invoices & Reports)
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-300">Business / Company Name</label>
+            <input 
+              type="text" 
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              placeholder="e.g. Casjoe Retail Hub"
+              className="w-full bg-[#111A30] border border-white/5 rounded-xl py-2 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF9F00]/50"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-300">Contact Email</label>
+            <input 
+              type="email" 
+              value={businessEmail}
+              onChange={(e) => setBusinessEmail(e.target.value)}
+              placeholder="hello@casjoe.com"
+              className="w-full bg-[#111A30] border border-white/5 rounded-xl py-2 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF9F00]/50"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-300">Phone Number</label>
+            <input 
+              type="text" 
+              value={businessPhone}
+              onChange={(e) => setBusinessPhone(e.target.value)}
+              placeholder="+234 800 000 0000"
+              className="w-full bg-[#111A30] border border-white/5 rounded-xl py-2 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF9F00]/50"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-300">Bank Account Details (For Payments)</label>
+            <input 
+              type="text" 
+              value={businessBank}
+              onChange={(e) => setBusinessBank(e.target.value)}
+              placeholder="GTBank - 0123456789"
+              className="w-full bg-[#111A30] border border-white/5 rounded-xl py-2 px-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF9F00]/50"
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Installed Models */}
       <div className="space-y-4">
