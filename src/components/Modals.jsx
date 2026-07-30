@@ -10,7 +10,7 @@ export default function Modals({ activeModal, onCloseModal }) {
   const [customerData, setCustomerData] = useState({
     name: '',
     company: '',
-    location: 'Lagos, Nigeria',
+    location: 'Nigeria',
     phone: '',
     totalSpent: '₦0'
   });
@@ -169,20 +169,18 @@ export default function Modals({ activeModal, onCloseModal }) {
                   onChange={(e) => setCustomerData({ ...customerData, location: e.target.value })}
                   className="custom-select w-full"
                 >
-                  <option value="Lagos, Nigeria">Lagos, Nigeria</option>
-                  <option value="Abuja, Nigeria">Abuja, Nigeria</option>
-                  <option value="Kano, Nigeria">Kano, Nigeria</option>
-                  <option value="Accra, Ghana">Accra, Ghana</option>
-                  <option value="Nairobi, Kenya">Nairobi, Kenya</option>
-                  <option value="Johannesburg, South Africa">Johannesburg, South Africa</option>
-                  <option value="Kigali, Rwanda">Kigali, Rwanda</option>
-                  <option value="Cairo, Egypt">Cairo, Egypt</option>
-                  <option value="Casablanca, Morocco">Casablanca, Morocco</option>
-                  <option value="Kampala, Uganda">Kampala, Uganda</option>
-                  <option value="Dar es Salaam, Tanzania">Dar es Salaam, Tanzania</option>
-                  <option value="Dakar, Senegal">Dakar, Senegal</option>
-                  <option value="Abidjan, Ivory Coast">Abidjan, Ivory Coast</option>
-                  <option value="Addis Ababa, Ethiopia">Addis Ababa, Ethiopia</option>
+                  <option value="Nigeria">Nigeria</option>
+                  <option value="Ghana">Ghana</option>
+                  <option value="Kenya">Kenya</option>
+                  <option value="South Africa">South Africa</option>
+                  <option value="Rwanda">Rwanda</option>
+                  <option value="Egypt">Egypt</option>
+                  <option value="Morocco">Morocco</option>
+                  <option value="Uganda">Uganda</option>
+                  <option value="Tanzania">Tanzania</option>
+                  <option value="Senegal">Senegal</option>
+                  <option value="Ivory Coast">Ivory Coast</option>
+                  <option value="Ethiopia">Ethiopia</option>
                 </select>
               </div>
             </div>
