@@ -28,14 +28,19 @@ export default function PromptsView({ onUsePrompt }) {
   return (
     <div className="p-4 lg:p-6 space-y-6 max-w-[1600px] mx-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0C1222] border border-white/10 p-6 rounded-2xl">
         <div className="space-y-1">
-          <h1 className="text-2xl lg:text-3xl font-extrabold font-['Outfit'] text-white flex items-center gap-2">
-            <BookOpen className="w-8 h-8 text-[#FF9F00]" />
-            Prompt Library
-          </h1>
-          <p className="text-slate-400 text-sm">
-            Ready-to-use professional prompts for every industry. No internet required.
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl lg:text-3xl font-extrabold font-['Outfit'] text-white flex items-center gap-2">
+              <BookOpen className="w-8 h-8 text-[#FF9F00]" />
+              Enterprise Prompt Library
+            </h1>
+            <span className="bg-[#FF9F00]/10 border border-[#FF9F00]/30 text-[#FF9F00] text-xs font-mono font-bold px-3 py-1 rounded-full">
+              100+ Offline Prompts (12 Sectors)
+            </span>
+          </div>
+          <p className="text-slate-400 text-sm max-w-3xl">
+            Pre-loaded with 120+ role-engineered, professional prompts covering Business, Healthcare, IT, Legal, Real Estate, Finance, Marketing, HR, E-Commerce, Education, Sales, and Customer Support. 100% offline, zero prompt engineering needed!
           </p>
         </div>
       </div>

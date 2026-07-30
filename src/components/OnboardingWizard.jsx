@@ -89,13 +89,13 @@ const OnboardingWizard = ({ onComplete, ollamaConnected, ollamaModels }) => {
             </div>
             <h2 className="text-2xl font-bold text-white">Setup Complete</h2>
             <p className="text-gray-400 max-w-md">
-              You are all set. Let's start automating your business.
+              You are all set! Explore our built-in <span className="text-[#FF9F00] font-semibold">100+ Enterprise Prompt Library</span> across 12 sectors, upload documents for offline RAG analysis, or start automating your business workflows.
             </p>
             <button
               onClick={onComplete}
               className="mt-8 flex items-center px-6 py-3 bg-[#FF9F00] text-black font-semibold rounded-lg hover:bg-[#FF6B00] transition-colors"
             >
-              Finish
+              Start Exploring
               <ArrowRight className="ml-2 w-5 h-5" />
             </button>
           </div>

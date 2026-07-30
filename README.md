@@ -13,11 +13,27 @@ The easiest way to experience Casjoe Local AI is to download the compiled Window
 *(Note: You must have [Ollama](https://ollama.com/) installed on your machine to power the offline AI features).*
 
 ## 🏆 Hackathon Project Highlights
-- **100% Offline AI:** Powered by Ollama and local LLMs (like Llama 3.2 3B and Phi-3), running locally on the user's machine.
+- **100% Offline AI:** Powered by Ollama and local LLMs (like Llama 3.2 3B and Phi-3), running locally on the user's machine with zero cloud latency.
+- **📚 100+ Enterprise Prompt Library:** Built-in library of 120+ role-engineered, expert prompts across 12 sectors (Business, Marketing, IT & Tech, Healthcare, Finance, Legal, Real Estate, HR, E-Commerce, Education, Sales, Customer Support), enabling anyone to get professional AI outputs without prompt engineering skills.
 - **Client-Side Document RAG:** Reads and analyzes PDF and TXT documents securely on the device without sending any data to the cloud.
 - **Agentic Automation:** The local AI can automatically generate invoices, add customers to your CRM, and write detailed reports based on natural language commands.
-- **Complete Business Suite:** Includes a fully functional CRM, Finance tracker (Invoices), Inventory manager, Point of Sale interface, and Document Vault.
+- **Complete Business Suite:** Includes a fully functional CRM, Finance tracker (Invoices), Inventory manager, Point of Sale interface, Document Vault, and Prompt Library.
 - **Zero Ongoing Costs:** Say goodbye to ChatGPT Plus subscriptions or API fees.
+
+## 📚 100+ Pre-Built Prompt Library (Across 12 Sectors)
+To empower users who are not prompt engineers, Casjoe Local AI comes pre-loaded with over 120 expert-crafted prompts structured for 12 major African economic sectors:
+- 💼 **Business & Operations** (Proposals, SWOT Matrix, Pitch Decks, SOPs)
+- 📢 **Marketing & Growth** (Content Calendars, Landing Page Copy, Meta/Google Ads)
+- 💻 **IT & Tech** (System Architecture, Code Audits, CI/CD Pipelines, API Specs)
+- 🏥 **Healthcare & Clinics** (Patient Care SOPs, Triage Guides, Discharge Instructions)
+- 💵 **Finance & Accounting** (12-Month Cash Flow Models, Break-Even Analysis, Tax Strategies)
+- ⚖️ **Legal & Admin** (Master Services Agreements, NDAs, Data Protection Policies)
+- 🏠 **Real Estate** (Investment Underwriting, Cap Rate Calculators, MLS Listing Copy)
+- 👥 **Human Resources** (Talent Acquisition Frameworks, 30-60-90 Day Onboarding, PIPs)
+- 🛒 **E-Commerce** (PDP Copywriting, Cart Abandonment Recovery Flows, Amazon FBA)
+- 🎓 **Education** (12-Week Course Syllabi, Lesson Plans, Exam Generators)
+- 📈 **Sales** (Enterprise Cold Outreach, Objection Handling Matrices, ABM Pitches)
+- 🎧 **Customer Support** (De-escalation Scripts, Ticket Escalation SOPs, SLA Matrices)
 
 ## 🛠️ Technology Stack
 - **Frontend UI:** React 19, Vite, TailwindCSS (Dark/Gold African-inspired UI theme)
