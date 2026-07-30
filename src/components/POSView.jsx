@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
-import { ShoppingCart, Search, Plus, Minus, Trash2, CheckCircle, Package } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingCart, Search, Plus, Minus, Trash2, CheckCircle, Package, CreditCard } from 'lucide-react';
 import db from '../db/database';
+import ReceiptPrintView from './ReceiptPrintView';
 
 export default function POSView({ inventory }) {
   const [cart, setCart] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [customerName, setCustomerName] = useState('Walk-in Customer');
+  const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [isProcessing, setIsProcessing] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [printingReceipt, setPrintingReceipt] = useState(null);
+
+  // Trigger print dialog when printingReceipt is set
+  useEffect(() => {
+    if (printingReceipt) {
+      setTimeout(() => {
+        window.print();
+        setPrintingReceipt(null);
+      }, 100);
+    }
+  }, [printingReceipt]);
 
   const filteredInventory = inventory.filter(item => 
     parseInt(item.quantity || 0, 10) > 0 && 
@@ -75,10 +88,20 @@ export default function POSView({ inventory }) {
         createdAt: new Date().toISOString()
       });
 
-      // Show Success
+      // Show Success and Trigger Receipt
+      const amtStr = `₦${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(cartTotal)}`;
       setSuccessMsg(`Sale successful! Invoice ${generatedId} generated.`);
+      setPrintingReceipt({
+        invoiceId: generatedId,
+        customer: customerName,
+        paymentMethod: paymentMethod,
+        amount: amtStr,
+        date: new Date().toISOString().split('T')[0],
+        itemsList: [...cart]
+      });
+      
       setCart([]);
-      setTimeout(() => setSuccessMsg(''), 3000);
+      setTimeout(() => setSuccessMsg(''), 4000);
       
     } catch (err) {
       console.error('Checkout failed', err);
@@ -149,7 +172,7 @@ export default function POSView({ inventory }) {
             <ShoppingCart className="w-5 h-5 text-amber-500" />
             Current Sale
           </h2>
-          <div className="mt-3">
+          <div className="mt-3 space-y-2">
             <input 
               type="text"
               value={customerName}
@@ -157,6 +180,21 @@ export default function POSView({ inventory }) {
               placeholder="Customer Name"
               className="w-full bg-[#111A30] border border-white/5 rounded-xl py-2 px-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF9F00]/50"
             />
+            <div className="flex gap-2">
+              {['Cash', 'Transfer', 'Card'].map(method => (
+                <button
+                  key={method}
+                  onClick={() => setPaymentMethod(method)}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors border ${
+                    paymentMethod === method 
+                      ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' 
+                      : 'bg-[#111A30] text-slate-400 border-white/5 hover:bg-white/5'
+                  }`}
+                >
+                  {method}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         
@@ -205,14 +243,20 @@ export default function POSView({ inventory }) {
           <button 
             onClick={handleCheckout}
             disabled={cart.length === 0 || isProcessing}
-            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-400 hover:opacity-90 disabled:opacity-50 text-black font-bold py-3.5 rounded-xl transition-opacity flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-500/20"
+            className={`w-full font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg ${
+              isProcessing 
+                ? 'bg-emerald-600 text-white cursor-not-allowed opacity-80' 
+                : cart.length === 0 
+                  ? 'bg-emerald-900/50 text-emerald-700 cursor-not-allowed border border-emerald-900'
+                  : 'bg-gradient-to-r from-emerald-500 to-emerald-400 hover:brightness-110 text-[#060913] shadow-emerald-500/20'
+            }`}
           >
             {isProcessing ? (
-              <span className="animate-pulse">Processing...</span>
+              <span className="animate-pulse tracking-wide font-black">Processing...</span>
             ) : (
               <>
                 <CheckCircle className="w-5 h-5" />
-                Complete Sale
+                <span className="tracking-wide font-black text-base">Complete Sale</span>
               </>
             )}
           </button>
@@ -225,6 +269,8 @@ export default function POSView({ inventory }) {
         </div>
       </div>
       
+      {/* Hidden Receipt Format */}
+      {printingReceipt && <ReceiptPrintView receipt={printingReceipt} />}
     </div>
   );
 }
