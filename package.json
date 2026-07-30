@@ -48,7 +48,7 @@
       "electron/**/*"
     ],
     "win": {
-      "target": "dir"
+      "target": "nsis"
     }
   }
 }
