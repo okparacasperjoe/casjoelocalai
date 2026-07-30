@@ -145,3 +145,16 @@ body {
   border-radius: 50%;
   animation: pulse-dot 2s infinite;
 }
+/* Light Mode Implementation */
+body.light-mode {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: #060913;
+}
+
+body.light-mode img,
+body.light-mode svg,
+body.light-mode .btn-primary,
+body.light-mode .btn-secondary,
+body.light-mode .offline-status-pill {
+  filter: invert(1) hue-rotate(180deg);
+}
