@@ -1,6 +1,7 @@
 import React from 'react';
 import { Menu, Sun, Moon, Search } from 'lucide-react';
 import GlobalAIChat from './GlobalAIChat';
+import casjoeLogo from '../assets/casjoelogo.png';
 
 export default function Navbar({ selectedModel, ollamaConnected, isDarkMode, toggleTheme }) {
   return (
@@ -10,7 +11,7 @@ export default function Navbar({ selectedModel, ollamaConnected, isDarkMode, tog
         <div className="flex items-center gap-3 cursor-pointer">
           {/* Logo image */}
           <div className="w-10 h-10 rounded-xl bg-[#090E1B] border border-[#FF9F00]/30 flex items-center justify-center p-1.5 shadow-md shadow-orange-500/10 transition-colors">
-            <img src="/casjoelogo.png" alt="Casjoe Logo" className="w-full h-full object-contain drop-shadow-md" />
+            <img src={casjoeLogo} alt="Casjoe Logo" className="w-full h-full object-contain drop-shadow-md" />
           </div>
 
           <div>

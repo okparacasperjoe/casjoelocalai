@@ -1,5 +1,6 @@
 import React from 'react';
 import { LayoutDashboard, Users, Wallet, Sparkles, FileText, Cpu, Settings, Package, ShoppingCart } from 'lucide-react';
+import casjoeLogo from '../assets/casjoelogo.png';
 
 export default function Sidebar({ activeTab, setActiveTab }) {
   const navItems = [
@@ -44,7 +45,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       {/* Bottom Left Logo Badge matching Image 1 */}
       <div className="pt-4 border-t border-white/5 px-2 flex items-center justify-start">
         <div className="w-8 h-8 rounded-lg bg-[#090E1B] border border-[#FF9F00]/30 flex items-center justify-center p-1 opacity-80 hover:opacity-100 transition-opacity">
-          <img src="/casjoelogo.png" alt="Casjoe Logo" className="w-full h-full object-contain drop-shadow-md" />
+          <img src={casjoeLogo} alt="Casjoe Logo" className="w-full h-full object-contain drop-shadow-md" />
         </div>
       </div>
     </aside>
