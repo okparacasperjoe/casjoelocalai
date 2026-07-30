@@ -12,7 +12,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "electron:dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
-    "electron:build": "vite build && electron-builder"
+    "electron:build": "vite build && electron-builder",
+    "electron:build:linux": "vite build && electron-builder --linux"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
@@ -54,6 +55,10 @@
     "win": {
       "target": "nsis",
       "icon": "build/icon.png"
+    },
+    "linux": {
+      "target": ["AppImage", "deb", "tar.gz"],
+      "category": "Utility"
     }
   }
 }
