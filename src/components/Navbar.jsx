@@ -8,14 +8,9 @@ export default function Navbar({ selectedModel, ollamaConnected, isDarkMode, tog
       {/* Left: Brand Logo & Title matching Image 1 */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3 cursor-pointer">
-          {/* Logo vector icon */}
+          {/* Logo image */}
           <div className="w-10 h-10 rounded-xl bg-[#090E1B] border border-[#FF9F00]/30 flex items-center justify-center p-1.5 shadow-md shadow-orange-500/10 transition-colors">
-            <svg className="w-full h-full text-[#FF9F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-              <path d="M50 12 A 38 38 0 1 0 88 50" strokeWidth="8" strokeLinecap="round" stroke="#FF9F00" />
-              <path d="M50 28 A 22 22 0 1 0 72 50" strokeWidth="8" strokeLinecap="round" stroke="#FF6B00" />
-              <circle cx="50" cy="50" r="8" fill="#FF9F00" />
-              <path d="M85 50 L95 50" strokeWidth="6" strokeLinecap="round" stroke="#FF9F00" />
-            </svg>
+            <img src="/casjoelogo.png" alt="Casjoe Logo" className="w-full h-full object-contain drop-shadow-md" />
           </div>
 
           <div>

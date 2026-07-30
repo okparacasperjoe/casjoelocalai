@@ -44,10 +44,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       {/* Bottom Left Logo Badge matching Image 1 */}
       <div className="pt-4 border-t border-white/5 px-2 flex items-center justify-start">
         <div className="w-8 h-8 rounded-lg bg-[#090E1B] border border-[#FF9F00]/30 flex items-center justify-center p-1 opacity-80 hover:opacity-100 transition-opacity">
-          <svg className="w-full h-full text-[#FF9F00]" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-            <path d="M50 12 A 38 38 0 1 0 88 50" strokeWidth="8" strokeLinecap="round" stroke="#FF9F00" />
-            <circle cx="50" cy="50" r="8" fill="#FF9F00" />
-          </svg>
+          <img src="/casjoelogo.png" alt="Casjoe Logo" className="w-full h-full object-contain drop-shadow-md" />
         </div>
       </div>
     </aside>
