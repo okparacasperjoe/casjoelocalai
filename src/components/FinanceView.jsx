@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CreditCard, FileText, Plus, DollarSign, ArrowUpRight, CheckCircle2, Clock, Sparkles } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { CreditCard, FileText, Plus, DollarSign, ArrowUpRight, CheckCircle2, Clock, Sparkles, Trash2 } from 'lucide-react';
+import { deleteInvoice } from '../db/hooks';
 
 export default function FinanceView({ invoices, onOpenCreateInvoice }) {
   const [selectedCurrency, setSelectedCurrency] = useState('NGN');
@@ -104,7 +104,8 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
                 <th className="py-3.5 px-5">Description</th>
                 <th className="py-3.5 px-5">Amount</th>
                 <th className="py-3.5 px-5">Issue Date</th>
-                <th className="py-3.5 px-5 text-right">Status</th>
+                <th className="py-3.5 px-5">Status</th>
+                <th className="py-3.5 px-5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -115,12 +116,17 @@ export default function FinanceView({ invoices, onOpenCreateInvoice }) {
                   <td className="py-4 px-5 text-slate-400">{inv.items}</td>
                   <td className="py-4 px-5 font-extrabold text-white font-['Outfit'] text-sm">{inv.amount}</td>
                   <td className="py-4 px-5 font-mono text-slate-400">{inv.date}</td>
-                  <td className="py-4 px-5 text-right">
+                  <td className="py-4 px-5">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                       inv.status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
                     }`}>
                       {inv.status}
                     </span>
+                  </td>
+                  <td className="py-4 px-5 text-right">
+                    <button onClick={() => deleteInvoice(inv.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
               ))}

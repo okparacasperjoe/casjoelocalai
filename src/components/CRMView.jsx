@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Search, MapPin, Phone, Building2, CheckCircle, Sparkles, Filter } from 'lucide-react';
-import { MOCK_CUSTOMERS } from '../data/mockData';
+import { Users, UserPlus, Search, MapPin, Phone, Building2, CheckCircle, Sparkles, Filter, Trash2 } from 'lucide-react';
+import { deleteCustomer } from '../db/hooks';
 
 export default function CRMView({ customers, onOpenAddCustomer }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -55,6 +55,14 @@ export default function CRMView({ customers, onOpenAddCustomer }) {
             <option value="Ghana">Ghana</option>
             <option value="Kenya">Kenya</option>
             <option value="South Africa">South Africa</option>
+            <option value="Rwanda">Rwanda</option>
+            <option value="Egypt">Egypt</option>
+            <option value="Morocco">Morocco</option>
+            <option value="Uganda">Uganda</option>
+            <option value="Tanzania">Tanzania</option>
+            <option value="Senegal">Senegal</option>
+            <option value="Ivory Coast">Ivory Coast</option>
+            <option value="Ethiopia">Ethiopia</option>
           </select>
         </div>
       </div>
@@ -70,7 +78,8 @@ export default function CRMView({ customers, onOpenAddCustomer }) {
                 <th className="py-3.5 px-5">Phone Contact</th>
                 <th className="py-3.5 px-5">Total Purchases</th>
                 <th className="py-3.5 px-5">Status</th>
-                <th className="py-3.5 px-5 text-right">AI Sentiment</th>
+                <th className="py-3.5 px-5">AI Sentiment</th>
+                <th className="py-3.5 px-5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -105,11 +114,16 @@ export default function CRMView({ customers, onOpenAddCustomer }) {
                       {c.status}
                     </span>
                   </td>
-                  <td className="py-4 px-5 text-right">
+                  <td className="py-4 px-5">
                     <span className="text-[11px] font-medium bg-amber-500/10 text-[#F59E0B] px-2.5 py-1 rounded-lg border border-amber-500/20 inline-flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
                       <span>High Retention</span>
                     </span>
+                  </td>
+                  <td className="py-4 px-5 text-right">
+                    <button onClick={() => deleteCustomer(c.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
               ))}

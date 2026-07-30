@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Package, Search, Plus, TrendingUp, AlertCircle, CheckCircle2, Box } from 'lucide-react';
+import { Package, Search, Plus, TrendingUp, AlertCircle, CheckCircle2, Box, Trash2 } from 'lucide-react';
+import { deleteInventoryItem } from '../db/hooks';
 
 export default function InventoryView({ inventory = [], onOpenAddModal }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -105,6 +106,7 @@ export default function InventoryView({ inventory = [], onOpenAddModal }) {
                 <th className="px-6 py-4 font-medium">Quantity</th>
                 <th className="px-6 py-4 font-medium">Unit Price</th>
                 <th className="px-6 py-4 font-medium">Status</th>
+                <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -140,6 +142,11 @@ export default function InventoryView({ inventory = [], onOpenAddModal }) {
                         {isOutOfStock ? <AlertCircle className="w-3.5 h-3.5" /> : isLowStock ? <AlertCircle className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                         {isOutOfStock ? 'Out of Stock' : isLowStock ? 'Low Stock' : 'In Stock'}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button onClick={() => deleteInventoryItem(item.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </td>
                   </tr>
                 );

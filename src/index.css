@@ -158,3 +158,9 @@ body.light-mode .btn-secondary,
 body.light-mode .offline-status-pill {
   filter: invert(1) hue-rotate(180deg);
 }
+
+/* Custom Select Dropdown Fix */
+select option {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+}

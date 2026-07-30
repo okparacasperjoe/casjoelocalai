@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { FileText, Search, Upload, BookOpen, ShieldCheck, Lock, Sparkles, Send, FileSpreadsheet, Plus, Laptop } from 'lucide-react';
-import { RAG_DOCUMENTS, PRESET_QNA } from '../data/mockData';
+import { FileText, Search, Upload, BookOpen, ShieldCheck, Lock, Sparkles, Send, FileSpreadsheet, Plus, Laptop, Trash2 } from 'lucide-react';
+import { deleteDocument } from '../db/hooks';
+import { PRESET_QNA } from '../data/mockData';
 
 export default function DocumentsView({ documents = [], onOpenUploadModal }) {
   const [searchQuery, setSearchQuery] = useState("What are the key terms of the payment policy?");
@@ -82,12 +83,20 @@ export default function DocumentsView({ documents = [], onOpenUploadModal }) {
                   key={doc.id}
                   className="bg-[#0C1222] border border-white/5 hover:border-amber-500/30 p-3 rounded-xl flex items-center justify-between transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
-                    <FileText className={`w-5 h-5 ${doc.type === 'pdf' ? 'text-rose-400' : doc.type === 'docx' ? 'text-sky-400' : 'text-emerald-400'}`} />
-                    <div>
-                      <h4 className="text-xs font-bold text-white">{doc.name}</h4>
-                      <span className="text-[10px] text-slate-400">{doc.size}</span>
+                  <div className="flex items-center gap-3 w-full justify-between">
+                    <div className="flex items-center gap-3">
+                      <FileText className={`w-5 h-5 ${doc.type === 'pdf' ? 'text-rose-400' : doc.type === 'docx' ? 'text-sky-400' : 'text-emerald-400'}`} />
+                      <div>
+                        <h4 className="text-xs font-bold text-white">{doc.name}</h4>
+                        <span className="text-[10px] text-slate-400">{doc.size}</span>
+                      </div>
                     </div>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); deleteDocument(doc.id); }}
+                      className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               ))}
