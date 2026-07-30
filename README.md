@@ -6,9 +6,11 @@ By operating entirely offline on consumer hardware (such as 8GB RAM laptops), Ca
 
 ## ⬇️ Download the Desktop App (For Judges)
 
-The easiest way to experience Casjoe Local AI is to download the compiled Windows Desktop App. No terminal or coding required!
+The easiest way to experience Casjoe Local AI is to download the compiled Desktop App. No terminal or coding required!
 
-👉 **[Download Casjoe Offline AI Setup 1.0.0.exe](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)**
+* 🪟 **[Windows Installer (.exe)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `Casjoe Offline AI Setup 1.0.0.exe`
+* 🐧 **[Linux Package (.tar.gz)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `casjoe-offline-ai-1.0.0.tar.gz`
+* 📦 **[Linux Archive (.zip)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `casjoe-offline-ai-1.0.0.zip`
 
 *(Note: You must have [Ollama](https://ollama.com/) installed on your machine to power the offline AI features).*
 
