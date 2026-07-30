@@ -15,7 +15,7 @@ function createWindow() {
     minHeight: 768,
     autoHideMenuBar: true,
     show: false, // Show when ready to prevent flickering
-    icon: path.join(__dirname, '../public/icons/icon-512.svg'),
+    icon: path.join(__dirname, '../public/icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
