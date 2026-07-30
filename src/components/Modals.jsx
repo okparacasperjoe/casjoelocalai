@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { X, UserPlus, FileText, CheckSquare, Sparkles, Upload, CheckCircle2, Building2, MapPin, Phone, DollarSign, Package } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { addCustomer, addInvoice, addDocument, addInventoryItem } from '../db/hooks';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Robust worker configuration for Vite
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 
 export default function Modals({ activeModal, onCloseModal }) {
   if (!activeModal) return null;
@@ -43,6 +50,8 @@ export default function Modals({ activeModal, onCloseModal }) {
 
   // Upload Doc State
   const [uploadFileName, setUploadFileName] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isParsing, setIsParsing] = useState(false);
 
   const handleCustomerSubmit = async (e) => {
     e.preventDefault();
@@ -108,17 +117,49 @@ export default function Modals({ activeModal, onCloseModal }) {
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
-    if (!uploadFileName) return;
-    await addDocument({
-      id: 'doc-' + Date.now(),
-      name: uploadFileName.endsWith('.pdf') || uploadFileName.endsWith('.docx') || uploadFileName.endsWith('.xlsx') ? uploadFileName : uploadFileName + '.pdf',
-      size: '1.8 MB',
-      type: 'pdf',
-      pages: 12,
-      date: new Date().toISOString().split('T')[0],
-      summary: 'Uploaded local business document parsed and indexed into Casjoe vector memory.'
-    });
-    onCloseModal();
+    if (!uploadFileName || !selectedFile) {
+      alert("Please select a file first.");
+      return;
+    }
+    
+    setIsParsing(true);
+    try {
+      let content = 'No text content extracted.';
+      let numPages = 1;
+      
+      if (selectedFile.type === 'application/pdf' || selectedFile.name.endsWith('.pdf')) {
+        const arrayBuffer = await selectedFile.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+        const pdf = await loadingTask.promise;
+        numPages = pdf.numPages;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          fullText += textContent.items.map(s => s.str).join(' ') + '\n';
+        }
+        content = fullText || 'No text found in PDF.';
+      } else {
+        content = await selectedFile.text();
+      }
+
+      await addDocument({
+        id: 'doc-' + Date.now(),
+        name: uploadFileName,
+        size: (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB',
+        type: selectedFile.name.split('.').pop() || 'pdf',
+        pages: numPages,
+        date: new Date().toISOString().split('T')[0],
+        summary: 'Manually uploaded document.',
+        content: content
+      });
+      onCloseModal();
+    } catch (err) {
+      console.error(err);
+      alert('Error parsing document: ' + err.message);
+    } finally {
+      setIsParsing(false);
+    }
   };
 
   return (
@@ -363,15 +404,32 @@ export default function Modals({ activeModal, onCloseModal }) {
               />
             </div>
 
-            <div className="border-2 border-dashed border-white/10 p-6 rounded-xl text-center space-y-2 bg-[#080C18]">
-              <Upload className="w-8 h-8 text-amber-500 mx-auto" />
-              <p className="text-xs text-slate-300">Drag & Drop files here or browse local disk</p>
-              <p className="text-[10px] text-slate-500">Supports PDF, DOCX, XLSX, TXT (100% Client-Side Vectorization)</p>
-            </div>
+            <input 
+              type="file" 
+              accept=".pdf,.txt" 
+              className="hidden" 
+              id="file-upload" 
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setSelectedFile(file);
+                  setUploadFileName(file.name);
+                }
+              }} 
+            />
+            <label htmlFor="file-upload" className="border-2 border-dashed border-white/10 p-6 rounded-xl text-center space-y-2 bg-[#080C18] cursor-pointer hover:border-amber-500/50 transition-colors block">
+              <Upload className={`w-8 h-8 mx-auto ${selectedFile ? 'text-emerald-500' : 'text-amber-500'}`} />
+              <p className={`text-xs font-bold ${selectedFile ? 'text-emerald-400' : 'text-slate-300'}`}>
+                {selectedFile ? selectedFile.name : 'Click to browse or drag & drop files here'}
+              </p>
+              <p className="text-[10px] text-slate-500">Supports PDF & TXT (100% Client-Side Extraction)</p>
+            </label>
 
             <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={onCloseModal} className="btn-secondary text-xs">Cancel</button>
-              <button type="submit" className="btn-primary text-xs">Vectorize Document Offline</button>
+              <button type="button" onClick={onCloseModal} className="btn-secondary text-xs" disabled={isParsing}>Cancel</button>
+              <button type="submit" className="btn-primary text-xs" disabled={isParsing}>
+                {isParsing ? 'Vectorizing...' : 'Vectorize Document Offline'}
+              </button>
             </div>
           </form>
         )}

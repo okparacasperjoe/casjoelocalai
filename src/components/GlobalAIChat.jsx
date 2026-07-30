@@ -52,9 +52,10 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
           properties: {
             name: { type: "string", description: "Name of the document (e.g. Lesson Plan 1, Patient Protocol)" },
             summary: { type: "string", description: "Summary of the document contents" },
-            type: { type: "string", description: "Document type (pdf, docx, txt)" }
+            type: { type: "string", description: "Document type (pdf, docx, txt)" },
+            content: { type: "string", description: "The full text content of the generated document. MUST be detailed and comprehensive." }
           },
-          required: ["name", "summary"]
+          required: ["name", "summary", "content"]
         }
       }
     }
@@ -73,7 +74,7 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
       const messages = [
         { 
           role: 'system', 
-          content: 'You are Casjoe Offline AI, an agentic AI assistant designed to help entrepreneurs, students, and healthcare workers across Africa. If the user asks to add a customer, create an invoice, or add a document, you MUST use the provided tools. If the user asks a general question (e.g., educational, healthcare advice, or general conversation), DO NOT use tools. Just respond nicely with the answer directly in Markdown.' 
+          content: 'You are Casjoe Offline AI, an agentic AI assistant. EXTREMELY IMPORTANT: DO NOT USE TOOLS UNLESS EXPLICITLY ASKED. If the user asks a general question, DO NOT use tools. Just respond nicely with the answer directly in Markdown. ONLY use tools if they say "add a customer", "create an invoice", or "add a document".' 
         },
         { role: 'user', content: userPrompt }
       ];
@@ -121,6 +122,7 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
               pages: 1,
               date: new Date().toISOString().split('T')[0],
               summary: args.summary || 'Added via AI Agent',
+              content: args.content || args.summary || 'Empty document.',
               createdAt: new Date().toISOString()
             });
             setFeedback({ text: `Document '${args.name}' added successfully to the vault!`, type: 'success' });

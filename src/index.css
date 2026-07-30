@@ -147,6 +147,30 @@ body {
   border-radius: 50%;
   animation: pulse-dot 2s infinite;
 }
+
+/* Custom Form Controls */
+.custom-input,
+.custom-select {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-card);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 100%;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.custom-input:focus,
+.custom-select:focus {
+  border-color: rgba(255, 159, 0, 0.5);
+  box-shadow: 0 0 0 2px rgba(255, 159, 0, 0.1);
+}
+
+.custom-input::placeholder {
+  color: var(--text-muted);
+}
+
 /* Light Mode Implementation */
 body.light-mode {
   filter: invert(1) hue-rotate(180deg);

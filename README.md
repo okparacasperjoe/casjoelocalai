@@ -1,16 +1,49 @@
-# React + Vite
+# Casjoe Local AI - Offline Business Engine
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Casjoe Local AI is an enterprise-grade, 100% offline business intelligence platform tailored specifically for entrepreneurs, healthcare workers, and students across Africa. 
 
-Currently, two official plugins are available:
+By operating entirely offline on consumer hardware (such as 8GB RAM laptops), Casjoe eliminates the need for expensive cloud APIs, prevents data privacy concerns, and works seamlessly regardless of internet reliability.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🏆 Hackathon Project Highlights
+- **100% Offline AI:** Powered by Ollama and local LLMs (like Llama 3.2 3B and Phi-3), running locally on the user's machine.
+- **Client-Side Document RAG:** Reads and analyzes PDF and TXT documents securely on the device without sending any data to the cloud.
+- **Agentic Automation:** The local AI can automatically generate invoices, add customers to your CRM, and write detailed reports based on natural language commands.
+- **Complete Business Suite:** Includes a fully functional CRM, Finance tracker (Invoices), Inventory manager, Point of Sale interface, and Document Vault.
+- **Zero Ongoing Costs:** Say goodbye to ChatGPT Plus subscriptions or API fees.
 
-## React Compiler
+## 🛠️ Technology Stack
+- **Frontend UI:** React 19, Vite, TailwindCSS (Dark/Gold African-inspired UI theme)
+- **Database:** IndexedDB via `dexie` (persistent local storage on device)
+- **Local AI integration:** Ollama API (`localhost:11434`)
+- **Document Processing:** `pdfjs-dist` & `jspdf` for completely local offline parsing and PDF generation
+- **Data Visualizations:** Chart.js
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 How to Run Locally
 
-## Expanding the Oxlint configuration
+### Prerequisites
+1. **Node.js** (v18+)
+2. **Ollama** installed on your system (Download at ollama.com)
+3. Pull a lightweight model to your machine:
+   ```bash
+   ollama run llama3.2
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### Installation
+1. Clone the repository (or extract the folder).
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open `http://localhost:5173` in your browser.
+
+## 💡 How It Works
+- **AI Chat Workspace:** Chat with your local AI, ask it business questions, or upload a PDF by clicking the paperclip icon. The PDF is analyzed directly on your device.
+- **Agentic Actions:** If you type "Create an invoice for John Doe for 50000", the AI will intelligently call the internal tools and add the invoice to your Finance tab automatically!
+- **Data Persistence:** Everything you add (customers, documents, invoices) is securely saved inside your browser's IndexedDB.
+
+---
+*Built with ❤️ for African Entrepreneurs by Casper Joe Okpara.*

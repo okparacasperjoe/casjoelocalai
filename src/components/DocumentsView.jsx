@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
-import { FileText, Search, Upload, BookOpen, ShieldCheck, Lock, Sparkles, Send, FileSpreadsheet, Plus, Laptop, Trash2 } from 'lucide-react';
-import { deleteDocument } from '../db/hooks';
+import { FileText, Search, Upload, BookOpen, Lock, Send, Plus, Laptop, Trash2, X, Download, Edit3, Save, ShieldCheck, Sparkles, Zap } from 'lucide-react';
+import { deleteDocument, updateDocument } from '../db/hooks';
 import { PRESET_QNA } from '../data/mockData';
+import jsPDF from 'jspdf';
 
 export default function DocumentsView({ documents = [], onOpenUploadModal }) {
   const [searchQuery, setSearchQuery] = useState("What are the key terms of the payment policy?");
   const [activeQna, setActiveQna] = useState(PRESET_QNA[0]);
+
+  // Document Modal State
+  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState('');
 
   const handleSearch = (e) => {
     e?.preventDefault();
@@ -14,6 +20,52 @@ export default function DocumentsView({ documents = [], onOpenUploadModal }) {
     let matched = PRESET_QNA.find(q => lower.includes(q.question.toLowerCase().slice(0, 15)));
     if (!matched) matched = PRESET_QNA[0];
     setActiveQna(matched);
+  };
+
+  const handleOpenDocument = (doc) => {
+    setSelectedDoc(doc);
+    setEditContent(doc.content || doc.summary || 'No content available.');
+    setIsEditing(false);
+  };
+
+  const handleSaveDocument = async () => {
+    if (selectedDoc) {
+      await updateDocument(selectedDoc.id, { content: editContent });
+      setSelectedDoc({ ...selectedDoc, content: editContent });
+      setIsEditing(false);
+    }
+  };
+
+  const handleDownloadPDF = () => {
+    if (!selectedDoc) return;
+    const doc = new jsPDF();
+    const margin = 10;
+    const maxLineWidth = 190; // A4 width (210) - 2 * margin
+    const lineHeight = 7;
+    let y = 20;
+
+    // Title
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(selectedDoc.name, margin, y);
+    y += lineHeight * 2;
+
+    // Content
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    const contentLines = doc.splitTextToSize(selectedDoc.content || selectedDoc.summary || '', maxLineWidth);
+    
+    // Page break logic
+    contentLines.forEach(line => {
+      if (y > 280) { // A4 height is 297
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(line, margin, y);
+      y += lineHeight;
+    });
+
+    doc.save(selectedDoc.name.replace(/\.[^/.]+$/, "") + ".pdf");
   };
 
   return (
@@ -81,13 +133,14 @@ export default function DocumentsView({ documents = [], onOpenUploadModal }) {
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="bg-[#0C1222] border border-white/5 hover:border-amber-500/30 p-3 rounded-xl flex items-center justify-between transition-colors cursor-pointer"
+                  onClick={() => handleOpenDocument(doc)}
+                  className="bg-[#0C1222] border border-white/5 hover:border-amber-500/30 p-3 rounded-xl flex items-center justify-between transition-colors cursor-pointer group"
                 >
                   <div className="flex items-center gap-3 w-full justify-between">
                     <div className="flex items-center gap-3">
                       <FileText className={`w-5 h-5 ${doc.type === 'pdf' ? 'text-rose-400' : doc.type === 'docx' ? 'text-sky-400' : 'text-emerald-400'}`} />
                       <div>
-                        <h4 className="text-xs font-bold text-white">{doc.name}</h4>
+                        <h4 className="text-xs font-bold text-white group-hover:text-amber-500 transition-colors">{doc.name}</h4>
                         <span className="text-[10px] text-slate-400">{doc.size}</span>
                       </div>
                     </div>
@@ -190,6 +243,75 @@ export default function DocumentsView({ documents = [], onOpenUploadModal }) {
           <span>📈 Boost Productivity</span>
         </div>
       </div>
+
+      {/* Document Viewer / Editor Modal */}
+      {selectedDoc && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#0A0F1D] border border-white/10 w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-4 border-b border-white/10 bg-[#070B15] rounded-t-2xl">
+              <div className="flex items-center gap-3">
+                <FileText className="w-5 h-5 text-[#FF9F00]" />
+                <div>
+                  <h3 className="font-bold text-white text-base leading-tight">{selectedDoc.name}</h3>
+                  <span className="text-xs text-slate-400">{selectedDoc.date} • {selectedDoc.size}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {isEditing ? (
+                  <button 
+                    onClick={handleSaveDocument}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded-lg text-xs font-bold transition-colors border border-emerald-500/30"
+                  >
+                    <Save className="w-3.5 h-3.5" /> Save
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-white/5 text-slate-300 hover:bg-white/10 rounded-lg text-xs font-bold transition-colors"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" /> Edit
+                  </button>
+                )}
+                
+                <button 
+                  onClick={handleDownloadPDF}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[#FF9F00]/20 text-[#FF9F00] hover:bg-[#FF9F00]/30 rounded-lg text-xs font-bold transition-colors border border-[#FF9F00]/30"
+                >
+                  <Download className="w-3.5 h-3.5" /> PDF
+                </button>
+                
+                <div className="w-px h-6 bg-white/10 mx-1"></div>
+                
+                <button 
+                  onClick={() => setSelectedDoc(null)}
+                  className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="p-6 flex-1 overflow-y-auto bg-[#0C1222] rounded-b-2xl">
+              {isEditing ? (
+                <textarea
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  className="w-full h-full min-h-[400px] bg-[#070B15] border border-white/10 rounded-xl p-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#FF9F00] resize-none"
+                  placeholder="Document content goes here..."
+                />
+              ) : (
+                <div className="prose prose-invert prose-sm max-w-none">
+                  <pre className="whitespace-pre-wrap font-sans text-sm text-slate-200 leading-relaxed bg-transparent border-none p-0 m-0">
+                    {selectedDoc.content || selectedDoc.summary || 'No content available.'}
+                  </pre>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -121,6 +121,10 @@ export const deleteInvoice = async (id) => {
   return db.invoices.delete(id);
 };
 
+export const updateDocument = async (id, data) => {
+  return db.documents.update(id, data);
+};
+
 export const deleteDocument = async (id) => {
   return db.documents.delete(id);
 };
