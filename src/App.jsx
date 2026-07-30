@@ -10,6 +10,7 @@ import FinanceView from './components/FinanceView';
 import SettingsView from './components/SettingsView';
 import InventoryView from './components/InventoryView';
 import POSView from './components/POSView';
+import PromptsView from './components/PromptsView';
 import Modals from './components/Modals';
 import OnboardingWizard from './components/OnboardingWizard';
 
@@ -24,6 +25,7 @@ export default function App() {
   const [ollamaConnected, setOllamaConnected] = useState(false);
   const [ollamaModels, setOllamaModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState('');
+  const [activePrompt, setActivePrompt] = useState('');
   
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return localStorage.getItem('onboardingCompleted') !== 'true';
@@ -127,12 +129,23 @@ export default function App() {
             />
           )}
 
+          {activeTab === 'prompts' && (
+            <PromptsView 
+              onUsePrompt={(text) => {
+                setActivePrompt(text);
+                setActiveTab('chat');
+              }} 
+            />
+          )}
+
           {activeTab === 'chat' && (
             <ChatView
               selectedModel={selectedModel}
               ollamaConnected={ollamaConnected}
               ramUsage={ramUsage}
               cpuUsage={cpuUsage}
+              activePrompt={activePrompt}
+              setActivePrompt={setActivePrompt}
             />
           )}
 

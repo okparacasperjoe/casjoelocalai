@@ -1,11 +1,12 @@
 import React from 'react';
-import { LayoutDashboard, Users, Wallet, Sparkles, FileText, Cpu, Settings, Package, ShoppingCart } from 'lucide-react';
+import { LayoutDashboard, Users, Wallet, Sparkles, FileText, Cpu, Settings, Package, ShoppingCart, BookOpen } from 'lucide-react';
 import casjoeLogo from '../assets/casjoelogo.png';
 
 export default function Sidebar({ activeTab, setActiveTab }) {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'chat', label: 'AI Chat', icon: Sparkles },
+    { id: 'prompts', label: 'Prompt Library', icon: BookOpen },
     { id: 'crm', label: 'CRM', icon: Users },
     { id: 'finance', label: 'Finance', icon: Wallet },
     { id: 'inventory', label: 'Inventory', icon: Package },

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, WifiOff, ShieldCheck, Zap, Laptop, Lock, Check, Paperclip, Loader2 } from 'lucide-react';
 import { streamChat, agentChat } from '../services/ollama';
 import { addChatMessage, useChatMessages } from '../db/hooks';
+import { PROMPT_LIBRARY } from '../data/prompts';
 import * as pdfjsLib from 'pdfjs-dist';
 
 // Robust worker configuration for Vite
@@ -10,7 +11,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
-export default function ChatView({ selectedModel, ollamaConnected }) {
+export default function ChatView({ selectedModel, ollamaConnected, activePrompt, setActivePrompt }) {
   const messages = useChatMessages('main-chat') || [];
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -27,6 +28,14 @@ export default function ChatView({ selectedModel, ollamaConnected }) {
   useEffect(() => {
     scrollToBottom();
   }, [messages, streamingText, isGenerating]);
+
+  // Handle incoming activePrompt from the Prompt Library tab
+  useEffect(() => {
+    if (activePrompt) {
+      setInput(activePrompt);
+      setActivePrompt(''); // clear it after setting
+    }
+  }, [activePrompt, setActivePrompt]);
 
   // Tools definition for agentChat (if the user asks the AI to create a document based on the uploaded file)
   const tools = [
@@ -414,6 +423,23 @@ export default function ChatView({ selectedModel, ollamaConnected }) {
             <div className={`flex items-center gap-2 text-xs font-bold ${ollamaConnected ? 'text-emerald-400' : 'text-amber-500'}`}>
               <span className={`w-2 h-2 rounded-full ${ollamaConnected ? 'bg-emerald-400' : 'bg-amber-500'}`} />
               <span>{ollamaConnected ? 'AI Connected' : 'Ollama Not Running'}</span>
+            </div>
+          </div>
+
+          {/* Quick Prompts Widget */}
+          <div className="bg-[#070B15] border border-white/10 p-4 rounded-xl flex flex-col max-h-[300px]">
+            <span className="text-xs text-slate-400 block font-medium mb-3">Quick Prompts</span>
+            <div className="flex-1 overflow-y-auto pr-1 space-y-2 custom-scrollbar">
+              {PROMPT_LIBRARY.slice(0, 15).map((p) => (
+                <div 
+                  key={p.id}
+                  onClick={() => setInput(p.text)}
+                  className="bg-[#090E1B] border border-white/5 p-3 rounded-lg hover:border-[#FF9F00]/30 hover:bg-white/5 transition-all cursor-pointer group"
+                >
+                  <p className="text-xs font-bold text-white group-hover:text-[#FF9F00] transition-colors">{p.title}</p>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">{p.text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
