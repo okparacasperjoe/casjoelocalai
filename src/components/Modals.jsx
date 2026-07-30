@@ -85,8 +85,8 @@ export default function Modals({ activeModal, onCloseModal }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onCloseModal}>
-      <div className="modal-content p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onCloseModal}>
+      <div className="bg-[#0C1222] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-2">
