@@ -8,9 +8,9 @@ By operating entirely offline on consumer hardware (such as 8GB RAM laptops), Ca
 
 The easiest way to experience Casjoe Local AI is to download the compiled Desktop App. No terminal or coding required!
 
-* 🪟 **[Windows Installer (.exe)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `Casjoe Offline AI Setup 1.0.0.exe`
-* 🐧 **[Linux Package (.tar.gz)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `casjoe-offline-ai-1.0.0.tar.gz`
-* 📦 **[Linux Archive (.zip)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `casjoe-offline-ai-1.0.0.zip`
+* 🪟 **[Windows Installer (.exe)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `Casjoe-Local-AI-Setup-1.0.0-Windows.exe`
+* 🐧 **[Linux Package (.tar.gz)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `Casjoe-Local-AI-1.0.0-Linux.tar.gz`
+* 📦 **[Linux Archive (.zip)](https://github.com/okparacasperjoe/casjoelocalai/releases/latest)** — `Casjoe-Local-AI-1.0.0-Linux.zip`
 
 *(Note: You must have [Ollama](https://ollama.com/) installed on your machine to power the offline AI features).*
 
