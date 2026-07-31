@@ -54,11 +54,13 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "build/icon.png"
+      "icon": "build/icon.png",
+      "artifactName": "Casjoe-Offline-AI-Setup-${version}-Windows.${ext}"
     },
     "linux": {
       "target": ["tar.gz", "zip"],
-      "category": "Utility"
+      "category": "Utility",
+      "artifactName": "Casjoe-Offline-AI-${version}-Linux.${ext}"
     }
   }
 }
