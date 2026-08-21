@@ -8,6 +8,10 @@ const __dirname = path.dirname(__filename);
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
 function createWindow() {
+  const appIconPath = isDev 
+    ? path.join(__dirname, '../public/casjoelogo.png') 
+    : path.join(__dirname, '../dist/casjoelogo.png');
+
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -15,7 +19,7 @@ function createWindow() {
     minHeight: 768,
     autoHideMenuBar: true,
     show: false, // Show when ready to prevent flickering
-    icon: path.join(__dirname, '../public/icon.png'),
+    icon: appIconPath,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
