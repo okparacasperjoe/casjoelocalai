@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, UserPlus, FileText, CheckSquare, Sparkles, Upload, CheckCircle2, Building2, MapPin, Phone, DollarSign, Package } from 'lucide-react';
+import { X, UserPlus, FileText, CheckSquare, Sparkles, Upload, CheckCircle2, Building2, MapPin, Package } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { addCustomer, addInvoice, addDocument, addInventoryItem } from '../db/hooks';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -11,8 +11,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 export default function Modals({ activeModal, onCloseModal }) {
-  if (!activeModal) return null;
-
   // Add Customer State
   const [customerData, setCustomerData] = useState({
     name: '',
@@ -52,6 +50,8 @@ export default function Modals({ activeModal, onCloseModal }) {
   const [uploadFileName, setUploadFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [isParsing, setIsParsing] = useState(false);
+
+  if (!activeModal) return null;
 
   const handleCustomerSubmit = async (e) => {
     e.preventDefault();
