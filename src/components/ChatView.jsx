@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, WifiOff, ShieldCheck, Zap, Laptop, Lock, Check, Paperclip, Loader2 } from 'lucide-react';
+import { Send, Sparkles, WifiOff, ShieldCheck, Zap, Paperclip, Loader2 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { streamChat, agentChat } from '../services/ollama';
-import { addChatMessage, useChatMessages } from '../db/hooks';
+import { addChatMessage, useChatMessages, addInvoice, addCustomer, addDocument } from '../db/hooks';
 import { PROMPT_LIBRARY } from '../data/prompts';
 import * as pdfjsLib from 'pdfjs-dist';
 
@@ -16,7 +17,6 @@ export default function ChatView({ selectedModel, ollamaConnected, activePrompt,
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [streamingText, setStreamingText] = useState('');
-  const [useLocalDocs, setUseLocalDocs] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -48,7 +48,7 @@ export default function ChatView({ selectedModel, ollamaConnected, activePrompt,
           type: "object",
           properties: {
             customer: { type: "string", description: "Name of the customer" },
-            amount: { type: "number", description: "Total amount in numbers" },
+            amount: { type: "number", description: "Total amount in numbers, e.g. 50000" },
             items: { type: "string", description: "Description of the items" }
           },
           required: ["customer", "amount", "items"]
@@ -184,76 +184,122 @@ export default function ChatView({ selectedModel, ollamaConnected, activePrompt,
     setStreamingText('');
 
     try {
-      // Build conversation history format for streamChat
+      // Build conversation history format for Ollama
       const history = messages.map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'assistant',
         content: msg.text
       }));
       
-      // Inject system prompt instructing it to use tools if asked
       history.unshift({
         role: 'system',
-        content: 'You are Casjoe Offline AI. EXTREMELY IMPORTANT: DO NOT USE TOOLS UNLESS EXPLICITLY ASKED. If the user just says "hello", "how are you", or asks a normal question, YOU MUST ANSWER NORMALLY WITH TEXT and DO NOT use any tools. ONLY use the add_document tool if the user explicitly says "create a document", "write a proposal", or "generate a report".'
+        content: 'You are Casjoe Offline AI. EXTREMELY IMPORTANT: DO NOT USE TOOLS UNLESS EXPLICITLY ASKED. If the user asks a normal question, answer concisely with Markdown text.'
       });
       
       history.push({ role: 'user', content: userText });
 
-      // First check if the model wants to call a tool (using agentChat)
-      const agentResponse = await agentChat(selectedModel, history, tools);
+      // Fast-path intent routing: Only check for tool-calls if prompt contains action intent keywords
+      const ACTION_KEYWORDS = ['create', 'add', 'generate', 'invoice', 'customer', 'document', 'proposal', 'report', 'bill', 'client', 'crm', 'vault'];
+      const hasActionIntent = ACTION_KEYWORDS.some(kw => userText.toLowerCase().includes(kw));
 
-      if (agentResponse.tool_calls && agentResponse.tool_calls.length > 0) {
-        // Model called a tool!
-        for (const tool of agentResponse.tool_calls) {
-          const fn = tool.function;
-          const args = typeof fn.arguments === 'string' ? JSON.parse(fn.arguments) : fn.arguments;
+      if (hasActionIntent) {
+        // Run agentChat to evaluate function calls
+        const agentResponse = await agentChat(selectedModel, history, tools);
 
-          if (fn.name === 'add_document') {
-             // Let's also import db dynamically here or just let the main GlobalAIChat handle db? 
-             // Wait, we need to save to db. We don't have direct db access imported here, but we can import it.
-             const db = (await import('../db/database')).default;
-             
-             await db.documents.add({
-              name: (args.name || 'Generated Document') + '.' + (args.type || 'pdf'),
-              size: '1.2 MB',
-              type: args.type || 'pdf',
-              pages: 1,
-              date: new Date().toISOString().split('T')[0],
-              summary: args.summary || 'Generated via Chat',
-              content: args.content || args.summary || 'Empty document.',
-              createdAt: new Date().toISOString()
-            });
+        if (agentResponse.tool_calls && agentResponse.tool_calls.length > 0) {
+          // Model called a tool!
+          for (const tool of agentResponse.tool_calls) {
+            const fn = tool.function;
+            const args = typeof fn.arguments === 'string' ? JSON.parse(fn.arguments) : fn.arguments;
 
-            await addChatMessage({
-              conversationId: 'main-chat',
-              sender: 'ai',
-              text: `✅ I have generated the document **${args.name}** and saved it to your Documents Vault. You can go to the Docs tab to view, edit, or download it as a PDF!`,
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
-          } else {
-            // Handle other tools casually
-             await addChatMessage({
-              conversationId: 'main-chat',
-              sender: 'ai',
-              text: `✅ Executed command: **${fn.name}**. Action completed successfully in the background.`,
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            });
+            if (fn.name === 'create_invoice') {
+              const formattedAmt = typeof args.amount === 'number' 
+                ? new Intl.NumberFormat('en-US').format(args.amount) 
+                : (args.amount || '0');
+
+              await addInvoice({
+                customer: args.customer || 'Customer',
+                amount: `₦${formattedAmt}`,
+                currency: 'NGN',
+                date: new Date().toISOString().split('T')[0],
+                status: 'Pending',
+                items: args.items || 'Professional Services'
+              });
+
+              confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+
+              await addChatMessage({
+                conversationId: 'main-chat',
+                sender: 'ai',
+                text: `✅ **Invoice Created!** Created an invoice for **${args.customer}** totaling **₦${formattedAmt}** for *"${args.items}"*. You can view, print, or edit it in the **Finance** tab.`,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              });
+            } else if (fn.name === 'add_customer') {
+              await addCustomer({
+                name: args.name || 'New Customer',
+                company: args.company || 'N/A',
+                location: args.location || 'Nigeria',
+                phone: args.phone || 'N/A',
+                totalSpent: '₦0',
+                status: 'Active'
+              });
+
+              confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+
+              await addChatMessage({
+                conversationId: 'main-chat',
+                sender: 'ai',
+                text: `✅ **Customer Added!** **${args.name}** (${args.company || 'N/A'}) has been added to your CRM records. View it under the **CRM** tab.`,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              });
+            } else if (fn.name === 'add_document') {
+              await addDocument({
+                name: (args.name || 'Generated Document') + '.' + (args.type || 'pdf'),
+                size: '1.2 MB',
+                type: args.type || 'pdf',
+                pages: 1,
+                date: new Date().toISOString().split('T')[0],
+                summary: args.summary || 'Generated via Chat',
+                content: args.content || args.summary || 'Empty document.'
+              });
+
+              confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+
+              await addChatMessage({
+                conversationId: 'main-chat',
+                sender: 'ai',
+                text: `✅ **Document Generated!** Saved **${args.name}** to your Document Vault. You can view or download it in the **Docs** tab.`,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              });
+            }
           }
+          setIsGenerating(false);
+          return;
+        } else if (agentResponse.content && agentResponse.content.trim()) {
+          // If agentChat returned a direct text answer, display it without double-requesting
+          await addChatMessage({
+            conversationId: 'main-chat',
+            sender: 'ai',
+            text: agentResponse.content,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          });
+          setIsGenerating(false);
+          return;
         }
-      } else {
-        // Normal streaming chat if no tools were called
-        let fullResponse = '';
-        await streamChat(selectedModel, history, (chunk) => {
-          fullResponse += chunk;
-          setStreamingText(fullResponse);
-        });
-
-        await addChatMessage({
-          conversationId: 'main-chat',
-          sender: 'ai',
-          text: fullResponse,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        });
       }
+
+      // Normal fast streaming chat path (no tool intent or tool call fallback)
+      let fullResponse = '';
+      await streamChat(selectedModel, history, (chunk) => {
+        fullResponse += chunk;
+        setStreamingText(fullResponse);
+      });
+
+      await addChatMessage({
+        conversationId: 'main-chat',
+        sender: 'ai',
+        text: fullResponse,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
     } catch (error) {
       console.error('Chat error:', error);
       await addChatMessage({

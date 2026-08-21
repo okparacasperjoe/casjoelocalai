@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Loader2, X } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { agentChat } from '../services/ollama';
 import db from '../db/database';
 
@@ -96,6 +97,7 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
               status: 'Active',
               createdAt: new Date().toISOString()
             });
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.2 } });
             setFeedback({ text: `Customer ${args.name} added successfully!`, type: 'success' });
           } 
           else if (fn.name === 'create_invoice') {
@@ -112,6 +114,7 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
               items: args.items || 'General Services',
               createdAt: new Date().toISOString()
             });
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.2 } });
             setFeedback({ text: `Invoice ${generatedId} created for ${args.customer}!`, type: 'success' });
           }
           else if (fn.name === 'add_document') {
@@ -125,6 +128,7 @@ export default function GlobalAIChat({ selectedModel, ollamaConnected }) {
               content: args.content || args.summary || 'Empty document.',
               createdAt: new Date().toISOString()
             });
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.2 } });
             setFeedback({ text: `Document '${args.name}' added successfully to the vault!`, type: 'success' });
           }
         }
