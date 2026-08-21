@@ -45,16 +45,20 @@
   "build": {
     "appId": "com.casjoe.localai",
     "productName": "Casjoe Local AI",
+    "asar": true,
     "directories": {
       "output": "dist-electron"
     },
     "files": [
       "dist/**/*",
-      "electron/**/*"
+      "electron/**/*",
+      "!model/**/*",
+      "!model",
+      "!dist-electron/**/*"
     ],
     "win": {
       "target": "nsis",
-      "icon": "build/icon.png",
+      "icon": null,
       "artifactName": "Casjoe-Local-AI-Setup-${version}-Windows.${ext}"
     },
     "linux": {
